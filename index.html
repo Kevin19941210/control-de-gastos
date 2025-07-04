@@ -16,10 +16,20 @@
     <!-- Carga de Chart.js para gráficos -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        body { 
-            font-family: 'Inter', sans-serif; 
-            background-color: #FFFFFF; /* Fondo blanco */
+        /* Estilos base para el cuerpo, ajustados para el modo claro/oscuro */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #FFFFFF; /* Fondo blanco por defecto (modo claro) */
+            color: #1F2937; /* Texto gris oscuro por defecto (modo claro) */
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
+
+        /* Modo oscuro */
+        body.dark-mode {
+            background-color: #1F2937; /* Fondo gris oscuro */
+            color: #D1D5DB; /* Texto gris claro */
+        }
+
         /* Estilos para la barra lateral en pantallas pequeñas */
         @media (max-width: 768px) {
             .sidebar {
@@ -73,6 +83,75 @@
         .radio-group label:hover {
             background-color: #374151; /* gray-700 hover */
         }
+
+        /* Estilos para el modo oscuro en elementos específicos */
+        .dark-mode .bg-white { background-color: #1F2937; }
+        .dark-mode .text-gray-800 { color: #D1D5DB; }
+        .dark-mode .shadow-md { box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3); }
+
+        /* Login Section */
+        .dark-mode #login-section .bg-gray-800 { background-color: #374151; }
+        .dark-mode #login-section .text-gray-100 { color: #F9FAFB; }
+        .dark-mode #login-section .text-gray-300 { color: #D1D5DB; }
+        .dark-mode #login-section .border-gray-600 { border-color: #4B5563; }
+        .dark-mode #login-section .bg-gray-700 { background-color: #4B5563; }
+        .dark-mode #login-section .focus\:ring-blue-500:focus { --tw-ring-color: #3B82F6; }
+
+        /* Sidebar */
+        .dark-mode .sidebar { background-color: #111827; }
+        .dark-mode .sidebar a { color: #D1D5DB; }
+        .dark-mode .sidebar a:hover { background-color: #374151; }
+        .dark-mode .sidebar .active-nav { background-color: #2563EB; }
+        .dark-mode .sidebar .text-red-300 { color: #F87171; }
+        .dark-mode .sidebar .hover\:bg-red-700:hover { background-color: #B91C1C; }
+
+        /* Main Content */
+        .dark-mode .bg-gray-100 { background-color: #1F2937; }
+        .dark-mode .text-gray-800 { color: #D1D5DB; } /* For section titles */
+
+        /* Cards and Tables */
+        .dark-mode .bg-gray-800 { background-color: #374151; }
+        .dark-mode .bg-gray-700 { background-color: #4B5563; }
+        .dark-mode .bg-gray-900 { background-color: #111827; }
+        .dark-mode .text-gray-100 { color: #F9FAFB; }
+        .dark-mode .text-gray-200 { color: #E5E7EB; }
+        .dark-mode .text-gray-300 { color: #D1D5DB; }
+        .dark-mode .text-gray-400 { color: #9CA3AF; }
+        .dark-mode .text-gray-500 { color: #6B7280; }
+        .dark-mode .border-gray-600 { border-color: #4B5563; }
+        .dark-mode .hover\:bg-gray-600:hover { background-color: #4B5563; }
+
+        /* Buttons */
+        .dark-mode .bg-blue-800 { background-color: #1E40AF; }
+        .dark-mode .hover\:bg-blue-900:hover { background-color: #1E3A8A; }
+        .dark-mode .bg-purple-600 { background-color: #7C3AED; }
+        .dark-mode .hover\:bg-purple-700:hover { background-color: #6D28D9; }
+        .dark-mode .bg-orange-600 { background-color: #EA580C; }
+        .dark-mode .hover\:bg-orange-700:hover { background-color: #C2410C; }
+        .dark-mode .bg-green-600 { background-color: #16A34A; }
+        .dark-mode .hover\:bg-green-700:hover { background-color: #15803D; }
+
+        /* Specific text colors */
+        .dark-mode .text-green-400 { color: #4ADE80; }
+        .dark-mode .text-red-400 { color: #F87171; }
+        .dark-mode .text-blue-400 { color: #60A5FA; }
+        .dark-mode .text-yellow-400 { color: #FACC15; }
+        .dark-mode .text-purple-400 { color: #C084FC; }
+
+        /* Radio group mapping */
+        .dark-mode .radio-group-mapping label {
+            background-color: #4B5563;
+            border-color: #374151;
+            color: #D1D5DB;
+        }
+        .dark-mode .radio-group-mapping label:hover {
+            background-color: #374151;
+        }
+        .dark-mode .radio-group-mapping input[type="radio"]:checked + label {
+            background-color: #2563EB;
+            color: white;
+        }
+
     </style>
 </head>
 <body class="text-gray-800 flex flex-col md:flex-row min-h-screen">
@@ -102,6 +181,11 @@
                     Entrar
                 </button>
                 <p id="login-error-message" class="text-red-400 text-center mt-4 hidden">Usuario o contraseña incorrectos.</p>
+                <div class="flex justify-center mt-6">
+                    <button type="button" id="theme-toggle" class="bg-gray-700 text-gray-300 py-2 px-4 rounded-lg hover:bg-gray-600 transition-colors flex items-center">
+                        <i class="fas fa-moon mr-2" id="theme-icon"></i> <span id="theme-text">Modo Oscuro</span>
+                    </button>
+                </div>
             </form>
         </div>
     </div>
@@ -132,6 +216,10 @@
             <!-- Nueva Pestaña: Objetivos -->
             <a href="#" id="nav-goals" class="block py-2.5 px-4 rounded-md transition duration-200 hover:bg-gray-700 hover:text-white flex items-center mt-2">
                 <i class="fas fa-bullseye mr-3"></i> Objetivos
+            </a>
+            <!-- Nueva Pestaña: Impuestos -->
+            <a href="#" id="nav-taxes" class="block py-2.5 px-4 rounded-md transition duration-200 hover:bg-gray-700 hover:text-white flex items-center mt-2">
+                <i class="fas fa-file-invoice-dollar mr-3"></i> Impuestos
             </a>
             <!-- Botón de Cerrar Sesión -->
             <a href="#" id="nav-logout" class="block py-2.5 px-4 rounded-md transition duration-200 hover:bg-red-700 hover:text-white flex items-center mt-6 text-red-300">
@@ -199,7 +287,7 @@
                     <h2 class="text-2xl font-semibold mb-4 text-gray-100">Resumen de Ingresos vs Gastos</h2>
                     <!-- Ajuste de altura y ancho del canvas para el gráfico de torta -->
                     <div class="relative w-64 h-64 md:w-80 md:h-80">
-                        <canvas id="transactionsChart"></canvas> 
+                        <canvas id="transactionsChart"></canvas>
                     </div>
                 </div>
 
@@ -397,6 +485,52 @@
                     </div>
                 </div>
             </section>
+
+            <!-- Nueva Sección: Impuestos -->
+            <section id="taxes-section" class="hidden">
+                <h1 class="text-4xl font-bold text-gray-800 mb-8 text-center md:text-left">Mis Impuestos (Gastos con Factura)</h1>
+
+                <!-- Tarjeta de Total a Devolver por IVA -->
+                <div class="bg-gray-800 p-6 rounded-xl shadow-lg text-center text-gray-100 mb-8">
+                    <h2 class="text-xl font-semibold text-gray-300">Total RE IVA a Devolver</h2>
+                    <p id="total-re-iva-return" class="text-4xl font-bold text-purple-400 mt-2">Bs. 0.00</p>
+                    <p id="loading-re-iva" class="text-gray-400 mt-2">Calculando...</p>
+                </div>
+
+                <!-- Tabla de Gastos con Factura -->
+                <div class="bg-gray-800 p-6 rounded-xl shadow-lg">
+                    <h2 class="text-2xl font-semibold mb-4 text-gray-100">Historial de Gastos con Factura</h2>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full bg-gray-700 rounded-lg shadow-md">
+                            <thead>
+                                <tr class="bg-gray-900 text-white">
+                                    <th class="py-3 px-4 text-left rounded-tl-lg">Fecha</th>
+                                    <th class="py-3 px-4 text-left">Tipo</th>
+                                    <th class="py-3 px-4 text-left">Cuenta</th>
+                                    <th class="py-3 px-4 text-left">Categoría</th>
+                                    <th class="py-3 px-4 text-right">Monto Original (Bs.)</th>
+                                    <th class="py-3 px-4 text-right">Total RE IVA (Bs.)</th>
+                                    <th class="py-3 px-4 text-center rounded-tr-lg">Acción</th> <!-- Nueva columna de acción -->
+                                </tr>
+                            </thead>
+                            <tbody id="taxes-table-body" class="text-gray-200">
+                                <!-- Los gastos con factura se cargarán aquí dinámicamente -->
+                                <p id="loading-taxes" class="text-gray-400 text-center py-4">Cargando gastos con factura...</p>
+                            </tbody>
+                            <tfoot id="taxes-table-footer" class="text-gray-100 bg-gray-900">
+                                <tr>
+                                    <td colspan="4" class="py-3 px-4 text-right font-bold">Totales:</td>
+                                    <td id="total-original-amount" class="py-3 px-4 text-right font-bold">Bs. 0.00</td>
+                                    <td id="total-re-iva-amount" class="py-3 px-4 text-right font-bold">Bs. 0.00</td>
+                                    <td class="py-3 px-4"></td> <!-- Celda vacía para la columna de acción -->
+                                </tr>
+                            </tfoot>
+                        </table>
+                        <p id="no-taxes-message" class="text-gray-400 text-center mt-4 hidden">No hay gastos registrados con factura.</p>
+                    </div>
+                </div>
+            </section>
+
         </main>
     </div>
 
@@ -408,6 +542,10 @@
             </button>
             <h2 id="modal-title" class="text-3xl font-bold text-gray-100 mb-6 text-center">Añadir Nueva Transacción</h2>
             <form id="transaction-form" class="space-y-4">
+                <div>
+                    <label for="transaction-date" class="block text-gray-300 font-medium mb-2">Fecha</label>
+                    <input type="date" id="transaction-date" name="date" class="w-full px-4 py-2 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-700 text-gray-100" required>
+                </div>
                 <div>
                     <label class="block text-gray-300 font-medium mb-2">Tipo</label>
                     <div class="radio-group flex space-x-4 justify-center">
@@ -617,6 +755,7 @@
         const navAccounts = document.getElementById('nav-accounts');
         const navServices = document.getElementById('nav-services');
         const navGoals = document.getElementById('nav-goals');
+        const navTaxes = document.getElementById('nav-taxes'); // Nuevo
         const navLogout = document.getElementById('nav-logout');
 
         const dashboardSection = document.getElementById('dashboard-section');
@@ -624,6 +763,7 @@
         const accountsSection = document.getElementById('accounts-section');
         const servicesSection = document.getElementById('services-section');
         const goalsSection = document.getElementById('goals-section');
+        const taxesSection = document.getElementById('taxes-section'); // Nuevo
 
         const totalExpensesTodayEl = document.getElementById('total-expenses-today');
         const loadingExpensesTodayEl = document.getElementById('loading-expenses-today');
@@ -647,6 +787,7 @@
         const transactionForm = document.getElementById('transaction-form');
         const modalTitle = document.getElementById('modal-title');
 
+        const transactionDateEl = document.getElementById('transaction-date'); // Nuevo elemento de fecha
         const transactionTypeRadioGasto = document.getElementById('type-gasto');
         const transactionTypeRadioIngreso = document.getElementById('type-ingreso');
         const transactionAccountEl = document.getElementById('transaction-account');
@@ -690,7 +831,7 @@
         const serviceDueDateEl = document.getElementById('service-due-date');
 
         const payServiceModal = document.getElementById('pay-service-modal');
-        const closePayServiceModalBtn = document = document.getElementById('close-pay-service-modal-btn');
+        const closePayServiceModalBtn = document.getElementById('close-pay-service-modal-btn');
         const payServiceForm = document.getElementById('pay-service-form');
         const payServiceIdEl = document.getElementById('pay-service-id');
         const payServiceAmountEl = document.getElementById('pay-service-amount');
@@ -726,13 +867,29 @@
         const closeSidebarBtn = document.getElementById('close-sidebar');
         const sidebar = document.querySelector('.sidebar');
 
-        let editingTransactionId = null; 
+        // Elementos de Impuestos (Nuevos)
+        const totalReIvaReturnEl = document.getElementById('total-re-iva-return');
+        const loadingReIvaEl = document.getElementById('loading-re-iva');
+        const taxesTableBody = document.getElementById('taxes-table-body');
+        const taxesTableFooter = document.getElementById('taxes-table-footer');
+        const totalOriginalAmountEl = document.getElementById('total-original-amount');
+        const totalReIvaAmountEl = document.getElementById('total-re-iva-amount');
+        const noTaxesMessage = document.getElementById('no-taxes-message');
+        const loadingTaxesEl = document.getElementById('loading-taxes');
+
+        // Elementos del tema
+        const themeToggleBtn = document.getElementById('theme-toggle');
+        const themeIcon = document.getElementById('theme-icon');
+        const themeText = document.getElementById('theme-text');
+
+
+        let editingTransactionId = null;
         let editingServiceId = null;
         let transactionsChart;
         let categoryExpensesChart;
 
         // Variable global para almacenar la inicial del usuario actual
-        let currentUserInitial = null; 
+        let currentUserInitial = null;
 
         // --- FUNCIONES DE UTILIDAD ---
 
@@ -756,9 +913,9 @@
             return `${day}/${month}/${year}`;
         }
 
-        // Formatea un monto a 'Bs. X.XX'
+        // Formatea un monto a 'Bs. X.XXX,XX' (formato numérico latino)
         function formatAmount(amount) {
-            return `Bs. ${parseFloat(amount).toFixed(2)}`;
+            return `Bs. ${new Intl.NumberFormat('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(parseFloat(amount))}`;
         }
 
         // Obtiene el mes y año actual en formato 'YYYY-MM'
@@ -767,6 +924,28 @@
             const year = today.getFullYear();
             const month = String(today.getMonth() + 1).padStart(2, '0');
             return `${year}-${month}`;
+        }
+
+        // --- FUNCIONES DE TEMA (Modo Claro/Oscuro) ---
+        function applyTheme(theme) {
+            if (theme === 'dark') {
+                document.body.classList.add('dark-mode');
+                themeIcon.classList.remove('fa-moon');
+                themeIcon.classList.add('fa-sun');
+                themeText.textContent = 'Modo Claro';
+            } else {
+                document.body.classList.remove('dark-mode');
+                themeIcon.classList.remove('fa-sun');
+                themeIcon.classList.add('fa-moon');
+                themeText.textContent = 'Modo Oscuro';
+            }
+            localStorage.setItem('theme', theme);
+        }
+
+        function toggleTheme() {
+            const currentTheme = localStorage.getItem('theme') || 'light';
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            applyTheme(newTheme);
         }
 
         // --- FUNCIONES DE AUTENTICACIÓN ---
@@ -873,12 +1052,21 @@
             const firstDayOfNextMonthISO = firstDayOfNextMonth.toISOString();
 
             try {
+                // Excluir transacciones que ya están en gastos_con_factura de los cálculos de gastos generales
                 const { data, error } = await supabaseClient
                     .from('gastos')
-                    .select('monto, tipo, created_at, categoria')
-                    .not('tipo', 'eq', 'traspaso'); // Excluir traspasos de ingresos/gastos
+                    .select('monto, tipo, created_at, categoria, id')
+                    .not('tipo', 'eq', 'traspaso');
 
                 if (error) throw error;
+
+                const { data: invoicedExpenses, error: invoicedError } = await supabaseClient
+                    .from('gastos_con_factura')
+                    .select('original_transaction_id');
+
+                if (invoicedError) throw invoicedError;
+
+                const invoicedIds = new Set(invoicedExpenses.map(item => item.original_transaction_id));
 
                 let totalExpensesToday = 0;
                 let totalIncomeMonth = 0;
@@ -888,8 +1076,13 @@
                 const categoryExpenses = {}; // Para el nuevo gráfico de categorías
 
                 data.forEach(item => {
+                    // Si la transacción es un gasto y ya está marcada como facturada, no la incluimos en los gastos generales
+                    if (item.tipo === 'gasto' && invoicedIds.has(item.id)) {
+                        return; // Saltar esta transacción
+                    }
+
                     const itemDate = new Date(item.created_at);
-                    
+
                     if (item.tipo === 'gasto') {
                         totalOverallExpenses += item.monto;
                         if (item.created_at >= todayISO && item.created_at < tomorrowISO) {
@@ -1067,6 +1260,15 @@
 
                 if (error) throw error;
 
+                // Obtener IDs de transacciones ya facturadas
+                const { data: invoicedExpenses, error: invoicedError } = await supabaseClient
+                    .from('gastos_con_factura')
+                    .select('original_transaction_id');
+
+                if (invoicedError) throw invoicedError;
+                const invoicedIds = new Set(invoicedExpenses.map(item => item.original_transaction_id));
+
+
                 if (data.length === 0) {
                     monthsContainer.innerHTML = '<p class="text-gray-400 text-center">No hay transacciones registradas.</p>';
                     loadingTransactionsEl.classList.add('hidden');
@@ -1078,7 +1280,7 @@
                     const year = date.getFullYear();
                     const month = date.getMonth(); // 0-indexed
                     const monthName = new Date(year, month).toLocaleString('es-ES', { month: 'long', year: 'numeric' });
-                    const monthKey = `${year}-${String(month + 1).padStart(2, '0')}`; // YYYY-MM
+                    const monthKey = `${year}-${String(month + 1).padStart(2, '0')}`; //YYYY-MM
 
                     if (!acc[monthKey]) {
                         acc[monthKey] = {
@@ -1102,7 +1304,7 @@
                         <i class="fas fa-chevron-down text-gray-400"></i>
                     `;
                     monthDiv.dataset.monthKey = monthKey;
-                    monthDiv.addEventListener('click', () => toggleMonthTransactions(monthKey, monthData.transactions));
+                    monthDiv.addEventListener('click', () => toggleMonthTransactions(monthKey, monthData.transactions, invoicedIds));
                     monthsContainer.appendChild(monthDiv);
                 });
 
@@ -1115,7 +1317,7 @@
         }
 
         // Muestra u oculta las transacciones de un mes específico
-        function toggleMonthTransactions(monthKey, transactions) {
+        function toggleMonthTransactions(monthKey, transactions, invoicedIds) {
             currentMonthTitle.textContent = `Transacciones de ${new Date(monthKey).toLocaleString('es-ES', { month: 'long', year: 'numeric' }).charAt(0).toUpperCase() + new Date(monthKey).toLocaleString('es-ES', { month: 'long', year: 'numeric' }).slice(1)}`;
             transactionsTableBody.innerHTML = ''; // Limpiar tabla
 
@@ -1130,7 +1332,7 @@
             transactions.forEach(transaction => {
                 const row = document.createElement('tr');
                 row.classList.add('border-b', 'border-gray-600', 'hover:bg-gray-600');
-                
+
                 let typeText = '';
                 let typeColorClass = '';
                 if (transaction.tipo === 'ingreso') {
@@ -1145,12 +1347,21 @@
                 }
 
                 // Mostrar cuenta de destino si es traspaso
-                const accountDisplay = transaction.tipo === 'traspaso' 
+                const accountDisplay = transaction.tipo === 'traspaso'
                     ? `${transaction.cuenta} <i class="fas fa-arrow-right text-gray-400 mx-1"></i> ${transaction.target_cuenta || 'N/A'}`
                     : transaction.cuenta || 'N/A';
-                
+
                 // La categoría para traspasos puede ser "Traspaso" o la descripción
                 const categoryDisplay = transaction.tipo === 'traspaso' ? 'Traspaso' : transaction.categoria || 'N/A';
+
+                // Determinar si el botón "Con Factura" debe estar visible o deshabilitado
+                const isExpense = transaction.tipo === 'gasto';
+                const isInvoiced = invoicedIds.has(transaction.id);
+                const facturaButtonHtml = isExpense
+                    ? `<button class="invoice-btn bg-purple-600 text-white p-1 rounded-full hover:bg-purple-700 transition-colors shadow-md text-sm ${isInvoiced ? 'opacity-50 cursor-not-allowed' : ''}" data-id="${transaction.id}" ${isInvoiced ? 'disabled' : ''}>
+                        <i class="fas fa-file-invoice"></i>
+                       </button>`
+                    : '';
 
                 row.innerHTML = `
                     <td class="py-3 px-4">${formatDate(transaction.created_at)}</td>
@@ -1163,13 +1374,14 @@
                     <td class="py-3 px-4">${categoryDisplay}</td>
                     <td class="py-3 px-4 text-right ${transaction.tipo === 'ingreso' ? 'text-green-400' : 'text-red-400'} font-medium">${formatAmount(transaction.monto)}</td>
                     <td class="py-3 px-4 text-center">${transaction.user_initial || 'N/A'}</td> <!-- Mostrar inicial del usuario -->
-                    <td class="py-3 px-4 text-center">
-                        <button class="edit-btn bg-blue-600 text-white p-2 rounded-full hover:bg-blue-700 transition-colors mr-2 shadow-md" data-id="${transaction.id}">
+                    <td class="py-3 px-4 text-center flex items-center justify-center space-x-2">
+                        <button class="edit-btn bg-blue-600 text-white p-2 rounded-full hover:bg-blue-700 transition-colors shadow-md" data-id="${transaction.id}">
                             <i class="fas fa-edit"></i>
                         </button>
                         <button class="delete-btn bg-red-600 text-white p-2 rounded-full hover:bg-red-700 transition-colors shadow-md" data-id="${transaction.id}">
                             <i class="fas fa-trash-alt"></i>
                         </button>
+                        ${facturaButtonHtml}
                     </td>
                 `;
                 transactionsTableBody.appendChild(row);
@@ -1191,6 +1403,17 @@
                     deleteTransaction(id);
                 });
             });
+
+            // Añadir event listeners para el nuevo botón "Con Factura"
+            document.querySelectorAll('.invoice-btn').forEach(button => {
+                button.addEventListener('click', (event) => {
+                    const id = event.currentTarget.dataset.id;
+                    const transactionToInvoice = transactions.find(t => t.id == id);
+                    if (transactionToInvoice) {
+                        markAsInvoiced(transactionToInvoice);
+                    }
+                });
+            });
         }
 
         // Abre el modal para añadir/editar transacción
@@ -1199,6 +1422,13 @@
             editingTransactionId = null;
             modalTitle.textContent = 'Añadir Nueva Transacción';
 
+            // Establecer la fecha actual por defecto para nuevas transacciones
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = String(today.getMonth() + 1).padStart(2, '0');
+            const day = String(today.getDate()).padStart(2, '0');
+            transactionDateEl.value = `${year}-${month}-${day}`;
+
             // Reset radio buttons
             transactionTypeRadioGasto.checked = true;
             transactionTypeRadioIngreso.checked = false;
@@ -1206,13 +1436,21 @@
             if (transaction) {
                 modalTitle.textContent = 'Editar Transacción';
                 editingTransactionId = transaction.id;
-                
+
+                // Establecer la fecha de la transacción existente
+                const transactionDate = new Date(transaction.created_at);
+                const transYear = transactionDate.getFullYear();
+                const transMonth = String(transactionDate.getMonth() + 1).padStart(2, '0');
+                const transDay = String(transactionDate.getDate()).padStart(2, '0');
+                transactionDateEl.value = `${transYear}-${transMonth}-${transDay}`;
+
+
                 if (transaction.tipo === 'gasto') {
                     transactionTypeRadioGasto.checked = true;
                 } else if (transaction.tipo === 'ingreso') {
                     transactionTypeRadioIngreso.checked = true;
                 }
-                
+
                 transactionAccountEl.value = transaction.cuenta || '';
                 transactionCategoryEl.value = transaction.categoria || '';
                 transactionAmountEl.value = transaction.monto;
@@ -1231,13 +1469,14 @@
         async function handleTransactionSubmit(event) {
             event.preventDefault();
 
+            const date = transactionDateEl.value; // Obtener la fecha
             const type = document.querySelector('input[name="transaction_type_radio"]:checked').value; // Obtener valor del radio button
             const account = transactionAccountEl.value;
             const category = transactionCategoryEl.value;
             const amount = parseFloat(transactionAmountEl.value);
             const description = transactionDescriptionEl.value;
 
-            if (!type || !account || !category || isNaN(amount) || amount <= 0) {
+            if (!date || !type || !account || !category || isNaN(amount) || amount <= 0) {
                 showNotification('Por favor, completa todos los campos obligatorios y asegúrate que el monto sea válido.', true);
                 return;
             }
@@ -1254,6 +1493,7 @@
                 if (editingTransactionId) {
                     // Actualizar transacción existente
                     const updateData = {
+                        created_at: new Date(date).toISOString(), // Usar la fecha seleccionada
                         tipo: type,
                         cuenta: account,
                         categoria: category,
@@ -1271,6 +1511,7 @@
                     response = await supabaseClient
                         .from('gastos')
                         .insert([{
+                            created_at: new Date(date).toISOString(), // Usar la fecha seleccionada
                             tipo: type,
                             cuenta: account,
                             categoria: category,
@@ -1300,6 +1541,11 @@
                 if (!goalsSection.classList.contains('hidden')) {
                     loadGoalsData();
                 }
+                // Recargar datos de impuestos si estamos en esa sección
+                if (!taxesSection.classList.contains('hidden')) {
+                    loadTaxesData();
+                }
+
 
             } catch (error) {
                 console.error('Error al guardar la transacción:', error.message);
@@ -1361,6 +1607,12 @@
 
                 if (error) throw error;
 
+                // También eliminar de gastos_con_factura si existe
+                await supabaseClient
+                    .from('gastos_con_factura')
+                    .delete()
+                    .eq('original_transaction_id', id);
+
                 showNotification('Transacción eliminada con éxito.');
                 updateDashboardData(); // Actualizar datos del dashboard
                 // Recargar el historial solo si estamos en la sección de transacciones
@@ -1378,6 +1630,10 @@
                 // Recargar datos de objetivos si estamos en esa sección
                 if (!goalsSection.classList.contains('hidden')) {
                     loadGoalsData();
+                }
+                // Recargar datos de impuestos si estamos en esa sección
+                if (!taxesSection.classList.contains('hidden')) {
+                    loadTaxesData();
                 }
             } catch (error) {
                 console.error('Error al eliminar la transacción:', error.message);
@@ -1546,9 +1802,9 @@
                 data.forEach(service => {
                     const row = document.createElement('tr');
                     row.classList.add('border-b', 'border-gray-600', 'hover:bg-gray-600');
-                    
+
                     const statusClass = service.estado === 'pendiente' ? 'bg-yellow-700 text-yellow-100' : 'bg-green-700 text-green-100';
-                    const actionButtons = service.estado === 'pendiente' ? 
+                    const actionButtons = service.estado === 'pendiente' ?
                         `<button class="pay-service-btn bg-blue-600 text-white p-2 rounded-full hover:bg-blue-700 transition-colors mr-2 shadow-md" data-id="${service.id}" data-amount="${service.monto}" data-name="${service.nombre_servicio}">
                             <i class="fas fa-dollar-sign"></i> Pagar
                         </button>` :
@@ -1920,6 +2176,7 @@
             const firstDayOfNextMonthISO = firstDayOfNextMonth.toISOString();
 
             try {
+                // Excluir gastos que ya están en gastos_con_factura
                 const { data, error } = await supabaseClient
                     .from('gastos')
                     .select('monto, tipo, tipo_gasto, categoria, created_at, id')
@@ -1929,8 +2186,16 @@
 
                 if (error) throw error;
 
+                const { data: invoicedExpenses, error: invoicedError } = await supabaseClient
+                    .from('gastos_con_factura')
+                    .select('original_transaction_id');
+
+                if (invoicedError) throw invoicedError;
+                const invoicedIds = new Set(invoicedExpenses.map(item => item.original_transaction_id));
+
+
                 data.forEach(item => {
-                    if (item.tipo === 'gasto') {
+                    if (item.tipo === 'gasto' && !invoicedIds.has(item.id)) { // Solo considerar gastos no facturados
                         totalExpensesMonth += item.monto;
                         if (item.tipo_gasto === 'fijo') {
                             totalFixedExpenses += item.monto;
@@ -2037,7 +2302,7 @@
             const realSaving = totalIncomeMonth - totalExpensesMonth;
 
             dashboardSavingAchievedEl.textContent = formatAmount(realSaving);
-            
+
             let percentageCompletion = 0;
             if (goalSaving > 0) {
                 percentageCompletion = (realSaving / goalSaving) * 100;
@@ -2046,7 +2311,7 @@
             }
 
             dashboardSavingPercentageEl.textContent = `${percentageCompletion.toFixed(2)}%`;
-            
+
             let statusText = 'No Definido';
             let statusColorClass = 'text-yellow-400';
 
@@ -2194,20 +2459,29 @@
                 const firstDayOfMonthISO = firstDayOfMonth.toISOString();
                 const firstDayOfNextMonthISO = firstDayOfNextMonth.toISOString();
 
+                // Excluir gastos que ya están en gastos_con_factura
                 const { data: transactions, error: transError } = await supabaseClient
                     .from('gastos')
-                    .select('monto, tipo')
+                    .select('monto, tipo, id')
                     .gte('created_at', firstDayOfMonthISO)
                     .lt('created_at', firstDayOfNextMonthISO)
                     .not('tipo', 'eq', 'traspaso');
 
                 if (transError) throw transError;
 
+                const { data: invoicedExpenses, error: invoicedError } = await supabaseClient
+                    .from('gastos_con_factura')
+                    .select('original_transaction_id');
+
+                if (invoicedError) throw invoicedError;
+                const invoicedIds = new Set(invoicedExpenses.map(item => item.original_transaction_id));
+
+
                 let totalIncome = 0;
                 let totalExpenses = 0;
                 transactions.forEach(t => {
                     if (t.tipo === 'ingreso') totalIncome += t.monto;
-                    else if (t.tipo === 'gasto') totalExpenses += t.monto;
+                    else if (t.tipo === 'gasto' && !invoicedIds.has(t.id)) totalExpenses += t.monto; // Solo considerar gastos no facturados
                 });
                 realSavingAmount = totalIncome - totalExpenses;
 
@@ -2339,11 +2613,223 @@
             }
         }
 
+        // --- FUNCIONES DE IMPUESTOS (Nuevas) ---
+
+        // Marca un gasto como "con factura" y lo traslada a la tabla de impuestos
+        async function markAsInvoiced(transaction) {
+            const confirmInvoice = await new Promise(resolve => {
+                const modal = document.createElement('div');
+                modal.className = 'fixed inset-0 bg-gray-950 bg-opacity-75 flex items-center justify-center p-4 z-[102]';
+                modal.innerHTML = `
+                    <div class="bg-gray-800 p-6 rounded-xl shadow-2xl w-full max-w-sm relative animate-fade-in-up text-center text-gray-100">
+                        <h3 class="text-xl font-bold text-gray-100 mb-4">¿Marcar como "Con Factura"?</h3>
+                        <p class="text-gray-300 mb-6">Este gasto se moverá a la sección de Impuestos y se calculará el RE IVA.</p>
+                        <div class="flex justify-center space-x-4">
+                            <button id="confirm-yes" class="bg-purple-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-purple-700 transition-colors shadow-md">Sí, Marcar</button>
+                            <button id="confirm-no" class="bg-gray-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-gray-700 transition-colors shadow-md">Cancelar</button>
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(modal);
+
+                document.getElementById('confirm-yes').addEventListener('click', () => {
+                    modal.remove();
+                    resolve(true);
+                });
+                document.getElementById('confirm-no').addEventListener('click', () => {
+                    modal.remove();
+                    resolve(false);
+                });
+            });
+
+            if (!confirmInvoice) {
+                return;
+            }
+
+            try {
+                const reIvaAmount = transaction.monto * 0.05; // Calcular 5% del monto original
+
+                // Insertar en la tabla 'gastos_con_factura'
+                const { error: insertError } = await supabaseClient
+                    .from('gastos_con_factura')
+                    .insert([{
+                        fecha: transaction.created_at,
+                        tipo: transaction.tipo,
+                        cuenta: transaction.cuenta,
+                        categoria: transaction.categoria,
+                        monto: transaction.monto,
+                        total_re_iva: reIvaAmount,
+                        original_transaction_id: transaction.id, // Guardar el ID de la transacción original
+                        user_initial: transaction.user_initial
+                    }]);
+
+                if (insertError) throw insertError;
+
+                showNotification('Gasto marcado con factura y trasladado a Impuestos.');
+                // Recargar las secciones relevantes
+                updateDashboardData();
+                loadMonthlyTransactions();
+                loadTaxesData(); // Cargar datos de impuestos para reflejar el cambio
+                loadGoalsData(); // Actualizar objetivos para que no se consideren estos gastos
+            } catch (error) {
+                console.error('Error al marcar como "Con Factura":', error.message);
+                showNotification('Error al marcar gasto con factura.', true);
+            }
+        }
+
+        // Carga y muestra los gastos con factura
+        async function loadTaxesData() {
+            loadingTaxesEl.classList.remove('hidden');
+            taxesTableBody.innerHTML = ''; // Limpiar tabla
+            noTaxesMessage.classList.add('hidden');
+            totalReIvaReturnEl.textContent = formatAmount(0); // Reset total RE IVA
+            totalOriginalAmountEl.textContent = formatAmount(0);
+            totalReIvaAmountEl.textContent = formatAmount(0);
+
+            try {
+                const { data, error } = await supabaseClient
+                    .from('gastos_con_factura')
+                    .select('*')
+                    .order('fecha', { ascending: false }); // Ordenar por fecha descendente
+
+                if (error) throw error;
+
+                if (data.length === 0) {
+                    noTaxesMessage.classList.remove('hidden');
+                    loadingTaxesEl.classList.add('hidden');
+                    return;
+                }
+
+                renderTaxesTable(data);
+
+            } catch (error) {
+                console.error('Error al cargar gastos con factura:', error.message);
+                taxesTableBody.innerHTML = '<tr><td colspan="7" class="text-red-400 text-center py-4">Error al cargar gastos con factura.</td></tr>';
+            } finally {
+                loadingTaxesEl.classList.add('hidden');
+                loadingReIvaEl.style.display = 'none';
+                totalReIvaReturnEl.style.display = 'block';
+            }
+        }
+
+        // Renderiza la tabla de impuestos y calcula totales
+        function renderTaxesTable(transactions) {
+            taxesTableBody.innerHTML = '';
+            let totalOriginalAmount = 0;
+            let totalReIva = 0;
+
+            transactions.forEach(transaction => {
+                // Asegurarse de que transaction.id exista antes de proceder
+                if (!transaction.id) {
+                    console.warn('Saltando transacción en la tabla de impuestos debido a la falta de ID:', transaction);
+                    return; // Saltar esta transacción
+                }
+
+                const row = document.createElement('tr');
+                row.classList.add('border-b', 'border-gray-600', 'hover:bg-gray-600');
+
+                totalOriginalAmount += transaction.monto;
+                totalReIva += transaction.total_re_iva;
+
+                row.innerHTML = `
+                    <td class="py-3 px-4">${formatDate(transaction.fecha)}</td>
+                    <td class="py-3 px-4">${transaction.tipo}</td>
+                    <td class="py-3 px-4">${transaction.cuenta}</td>
+                    <td class="py-3 px-4">${transaction.categoria}</td>
+                    <td class="py-3 px-4 text-right">${formatAmount(transaction.monto)}</td>
+                    <td class="py-3 px-4 text-right text-purple-400 font-medium">${formatAmount(transaction.total_re_iva)}</td>
+                    <td class="py-3 px-4 text-center">
+                        <button class="revert-invoice-btn bg-orange-600 text-white p-1 rounded-full hover:bg-orange-700 transition-colors shadow-md text-xs" data-id="${transaction.id}">
+                            R
+                        </button>
+                    </td>
+                `;
+                taxesTableBody.appendChild(row);
+            });
+
+            totalOriginalAmountEl.textContent = formatAmount(totalOriginalAmount);
+            totalReIvaAmountEl.textContent = formatAmount(totalReIva);
+            totalReIvaReturnEl.textContent = formatAmount(totalReIva); // Actualizar tarjeta destacada
+
+            // Añadir event listeners para el botón "Revertir" en la tabla de impuestos
+            document.querySelectorAll('.revert-invoice-btn').forEach(button => {
+                button.addEventListener('click', (event) => {
+                    const id = event.currentTarget.dataset.id;
+                    // Verificar que el ID sea válido antes de llamar a la función
+                    if (id && id !== "undefined") {
+                        revertInvoicedTransaction(id);
+                    } else {
+                        console.error('Se intentó revertir con un ID no válido desde el botón:', id);
+                        showNotification('Error: ID de factura no válido para revertir.', true);
+                    }
+                });
+            });
+        }
+
+        // Función para revertir una transacción marcada con factura
+        async function revertInvoicedTransaction(id) {
+            const confirmRevert = await new Promise(resolve => {
+                const modal = document.createElement('div');
+                modal.className = 'fixed inset-0 bg-gray-950 bg-opacity-75 flex items-center justify-center p-4 z-[102]';
+                modal.innerHTML = `
+                    <div class="bg-gray-800 p-6 rounded-xl shadow-2xl w-full max-w-sm relative animate-fade-in-up text-center text-gray-100">
+                        <h3 class="text-xl font-bold text-gray-100 mb-4">¿Revertir Factura?</h3>
+                        <p class="text-gray-300 mb-6">Esta acción eliminará el registro de factura. El gasto original volverá a estar disponible para marcar con factura.</p>
+                        <div class="flex justify-center space-x-4">
+                            <button id="confirm-yes" class="bg-orange-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-orange-700 transition-colors shadow-md">Sí, Revertir</button>
+                            <button id="confirm-no" class="bg-gray-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-gray-700 transition-colors shadow-md">Cancelar</button>
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(modal);
+
+                document.getElementById('confirm-yes').addEventListener('click', () => {
+                    modal.remove();
+                    resolve(true);
+                });
+                document.getElementById('confirm-no').addEventListener('click', () => {
+                    modal.remove();
+                    resolve(false);
+                });
+            });
+
+            if (!confirmRevert) {
+                return;
+            }
+
+            // Validar el ID antes de la llamada a Supabase
+            if (!id || id === "undefined") {
+                console.error('Error: ID de transacción para revertir es indefinido o nulo (o la cadena "undefined"). ID recibido:', id);
+                showNotification('Error: ID de transacción para revertir no encontrado.', true);
+                return;
+            }
+
+            try {
+                const { error } = await supabaseClient
+                    .from('gastos_con_factura')
+                    .delete()
+                    .eq('id', id); // Eliminar por el ID de la tabla de facturas
+
+                if (error) throw error;
+
+                showNotification('Gasto revertido de factura con éxito.');
+                updateDashboardData();
+                loadMonthlyTransactions(); // Recargar transacciones para que el botón "Con Factura" vuelva a aparecer
+                loadTaxesData(); // Recargar tabla de impuestos
+            } catch (error) {
+                console.error('Error al revertir la factura:', error.message);
+                showNotification('Error al revertir la factura.', true);
+            }
+        }
+
 
         // --- EVENT LISTENERS ---
 
         // Listener para el formulario de login
         loginForm.addEventListener('submit', handleLoginSubmit);
+
+        // Listener para el botón de alternar tema
+        themeToggleBtn.addEventListener('click', toggleTheme);
 
         // Navegación de pestañas
         navDashboard.addEventListener('click', (e) => {
@@ -2374,6 +2860,12 @@
             e.preventDefault();
             showSection('goals-section');
             loadGoalsData(); // Cargar datos de objetivos al ir a la sección
+        });
+
+        navTaxes.addEventListener('click', (e) => { // Nuevo listener para Impuestos
+            e.preventDefault();
+            showSection('taxes-section');
+            loadTaxesData(); // Cargar datos de impuestos al ir a la sección
         });
 
         navLogout.addEventListener('click', (e) => { // Listener para cerrar sesión
@@ -2440,6 +2932,10 @@
 
         // Inicialización al cargar el DOM
         document.addEventListener('DOMContentLoaded', () => {
+            // Aplicar el tema guardado o el tema por defecto
+            const savedTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            applyTheme(savedTheme);
+
             // Comprobar si hay una sesión guardada
             const storedInitial = localStorage.getItem('currentUserInitial');
             if (storedInitial) {
