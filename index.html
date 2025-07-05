@@ -151,6 +151,24 @@
             background-color: #2563EB;
             color: white;
         }
+        
+        /* CORREGIDO: Estilo de Acordeón con CSS Grid */
+        .accordion-grid-wrapper {
+            display: grid;
+            grid-template-rows: 0fr;
+            transition: grid-template-rows 0.3s ease-out;
+        }
+        .accordion-grid-wrapper.open {
+            grid-template-rows: 1fr;
+        }
+        .accordion-content {
+            overflow: hidden;
+            background-color: #374151; /* gray-800 */
+            min-height: 0;
+        }
+
+        .accordion-header-level-1 { background-color: #111827; } /* gray-900 */
+        .accordion-header-level-2 { background-color: #1f2937; } /* gray-800 */
 
     </style>
 </head>
@@ -213,15 +231,12 @@
             <a href="#" id="nav-services" class="block py-2.5 px-4 rounded-md transition duration-200 hover:bg-gray-700 hover:text-white flex items-center mt-2">
                 <i class="fas fa-tools mr-3"></i> Gestión de Servicios
             </a>
-            <!-- Nueva Pestaña: Objetivos -->
             <a href="#" id="nav-goals" class="block py-2.5 px-4 rounded-md transition duration-200 hover:bg-gray-700 hover:text-white flex items-center mt-2">
                 <i class="fas fa-bullseye mr-3"></i> Objetivos
             </a>
-            <!-- Nueva Pestaña: Impuestos -->
             <a href="#" id="nav-taxes" class="block py-2.5 px-4 rounded-md transition duration-200 hover:bg-gray-700 hover:text-white flex items-center mt-2">
                 <i class="fas fa-file-invoice-dollar mr-3"></i> Impuestos
             </a>
-            <!-- Botón de Cerrar Sesión -->
             <a href="#" id="nav-logout" class="block py-2.5 px-4 rounded-md transition duration-200 hover:bg-red-700 hover:text-white flex items-center mt-6 text-red-300">
                 <i class="fas fa-sign-out-alt mr-3"></i> Cerrar Sesión
             </a>
@@ -230,7 +245,6 @@
 
     <!-- Área de contenido principal -->
     <div id="main-app-content" class="flex-1 flex flex-col overflow-hidden content-area hidden">
-        <!-- Botón para abrir la barra lateral en móvil -->
         <header class="bg-white shadow-md p-4 flex justify-between items-center md:hidden">
             <button id="open-sidebar" class="text-gray-800 focus:outline-none">
                 <i class="fas fa-bars text-2xl"></i>
@@ -241,13 +255,22 @@
         <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-4 sm:p-6 md:p-8">
             <!-- Sección de Dashboard -->
             <section id="dashboard-section" class="active-section">
-                <h1 class="text-4xl font-bold text-gray-800 mb-8 text-center md:text-left">Dashboard</h1>
+                <h1 class="text-4xl font-bold text-gray-800 mb-6 text-center md:text-left">Dashboard</h1>
+                
+                <!-- Selector de Mes -->
+                <div class="mb-6 max-w-xs mx-auto md:mx-0">
+                    <label for="dashboard-month-selector" class="block text-sm font-medium text-gray-400 mb-2">Seleccionar Mes para Resumen:</label>
+                    <select id="dashboard-month-selector" class="w-full px-4 py-2 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-700 text-gray-100">
+                        <!-- Opciones de meses se cargarán dinámicamente -->
+                    </select>
+                </div>
+
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-                    <!-- Tarjeta de Total Gastado Hoy -->
+                    <!-- Tarjeta de Total Gastado por Mes -->
                     <div class="bg-gray-800 p-6 rounded-xl shadow-lg text-center text-gray-100">
-                        <h2 class="text-xl font-semibold text-gray-300">Total Gastado (Hoy)</h2>
-                        <p id="total-expenses-today" class="text-4xl font-bold text-red-400 mt-2">Bs. 0.00</p>
-                        <p id="loading-expenses-today" class="text-gray-400 mt-2">Calculando...</p>
+                        <h2 class="text-xl font-semibold text-gray-300">Total Gastado (Mes)</h2>
+                        <p id="total-expenses-month" class="text-4xl font-bold text-red-400 mt-2">Bs. 0.00</p>
+                        <p id="loading-expenses-month" class="text-gray-400 mt-2">Calculando...</p>
                     </div>
                     <!-- Tarjeta de Total Ingresos (Mes) -->
                     <div class="bg-gray-800 p-6 rounded-xl shadow-lg text-center text-gray-100">
@@ -263,7 +286,7 @@
                     </div>
                 </div>
 
-                <!-- Resumen de Objetivos del Mes (Nuevo en Dashboard) -->
+                <!-- Resumen de Objetivos del Mes -->
                 <div class="bg-gray-800 p-6 rounded-xl shadow-lg mb-8">
                     <h2 class="text-2xl font-semibold mb-4 text-gray-100">Resumen de Objetivos del Mes</h2>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-center text-gray-100">
@@ -284,16 +307,14 @@
 
                 <!-- Gráficos de Resumen -->
                 <div class="bg-gray-800 p-6 rounded-xl shadow-lg mb-8 flex flex-col items-center">
-                    <h2 class="text-2xl font-semibold mb-4 text-gray-100">Resumen de Ingresos vs Gastos</h2>
-                    <!-- Ajuste de altura y ancho del canvas para el gráfico de torta -->
+                    <h2 class="text-2xl font-semibold mb-4 text-gray-100">Resumen de Ingresos vs Gastos (Total)</h2>
                     <div class="relative w-64 h-64 md:w-80 md:h-80">
                         <canvas id="transactionsChart"></canvas>
                     </div>
                 </div>
 
-                <!-- Nuevo Gráfico de Barras: Gastos por Categoría -->
                 <div class="bg-gray-800 p-6 rounded-xl shadow-lg mb-8">
-                    <h2 class="text-2xl font-semibold mb-4 text-gray-100">Gastos por Categoría (Mes Actual)</h2>
+                    <h2 class="text-2xl font-semibold mb-4 text-gray-100">Gastos por Categoría (Mes Seleccionado)</h2>
                     <div class="relative w-full h-80">
                         <canvas id="categoryExpensesChart"></canvas>
                     </div>
@@ -302,45 +323,27 @@
 
             <!-- Sección de Transacciones -->
             <section id="transactions-section" class="hidden">
-                <h1 class="text-4xl font-bold text-gray-800 mb-8 text-center md:text-left">Historial de Transacciones</h1>
+                <h1 class="text-4xl font-bold text-gray-800 mb-6 text-center md:text-left">Historial de Transacciones</h1>
 
-                <!-- Botón para añadir nueva transacción dentro de la sección de Transacciones -->
-                <button id="add-transaction-btn" class="mb-8 bg-blue-800 text-white font-bold py-2 px-3 rounded-lg hover:bg-blue-900 transition-colors shadow-md flex items-center justify-center text-sm">
-                    <i class="fas fa-plus-circle mr-2"></i> Nueva Transacción
-                </button>
-
-                <!-- Contenedor para la lista de meses -->
-                <div id="monthly-transactions-list" class="bg-gray-800 p-6 rounded-xl shadow-lg mb-8">
-                    <h2 class="text-2xl font-semibold mb-4 text-gray-100">Transacciones por Mes</h2>
-                    <div id="months-container" class="space-y-2">
-                        <!-- Los meses se cargarán aquí dinámicamente -->
-                        <p id="loading-transactions" class="text-gray-400 text-center">Cargando transacciones...</p>
-                    </div>
+                <!-- Total Gastado Hoy -->
+                <div class="bg-gray-800 p-6 rounded-xl shadow-lg text-center text-gray-100 mb-8 max-w-sm mx-auto">
+                    <h2 class="text-xl font-semibold text-gray-300">Total Gastado (Hoy)</h2>
+                    <p id="daily-total-expenses" class="text-4xl font-bold text-red-400 mt-2">Bs. 0.00</p>
+                    <p id="loading-daily-expenses" class="text-gray-400 mt-2">Calculando...</p>
                 </div>
 
-                <!-- Contenedor para la tabla de transacciones de un mes específico -->
-                <div id="transactions-table-container" class="bg-gray-800 p-6 rounded-xl shadow-lg hidden">
-                    <h2 id="current-month-title" class="text-2xl font-semibold mb-4 text-gray-100"></h2>
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full bg-gray-700 rounded-lg shadow-md">
-                            <thead>
-                                <tr class="bg-gray-900 text-white">
-                                    <th class="py-3 px-4 text-left rounded-tl-lg">Fecha</th>
-                                    <th class="py-3 px-4 text-left">Tipo</th>
-                                    <th class="py-3 px-4 text-left">Cuenta</th>
-                                    <th class="py-3 px-4 text-left">Categoría</th>
-                                    <th class="py-3 px-4 text-right">Monto (Bs.)</th>
-                                    <th class="py-3 px-4 text-center">Usuario</th> <!-- Nueva columna para inicial de usuario -->
-                                    <th class="py-3 px-4 text-center rounded-tr-lg">Acción</th>
-                                </tr>
-                            </thead>
-                            <tbody id="transactions-table-body" class="text-gray-200">
-                                <!-- Las transacciones se cargarán aquí dinámicamente -->
-                            </tbody>
-                        </table>
-                    </div>
-                    <p id="no-transactions-message" class="text-gray-400 text-center mt-4 hidden">No hay transacciones para este mes.</p>
+                <div class="flex justify-start mb-6">
+                    <button id="add-transaction-btn" class="bg-blue-800 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-900 transition-colors shadow-md flex items-center text-base">
+                        <i class="fas fa-plus-circle mr-2"></i> Nueva Transacción
+                    </button>
                 </div>
+
+                <!-- Contenedor para el acordeón de historial -->
+                <div id="history-accordion-container" class="space-y-2">
+                    <!-- El acordeón de meses y días se cargará aquí -->
+                    <p id="loading-transactions" class="text-gray-400 text-center">Cargando historial...</p>
+                </div>
+                <p id="no-transactions-message" class="text-gray-400 text-center mt-4 hidden">No hay transacciones registradas.</p>
             </section>
 
             <!-- Sección de Saldo de Cuentas -->
@@ -352,7 +355,6 @@
                     <p id="loading-account-balances" class="text-gray-500 text-center col-span-full">Cargando saldos...</p>
                 </div>
 
-                <!-- Botón para registrar traspaso entre cuentas (más pequeño) -->
                 <button id="add-transfer-btn" class="w-full bg-blue-800 text-white font-bold py-2 px-3 rounded-lg hover:bg-blue-900 transition-colors shadow-md flex items-center justify-center text-sm">
                     <i class="fas fa-exchange-alt mr-2"></i> Registrar Traspaso
                 </button>
@@ -363,19 +365,16 @@
                 <h1 class="text-4xl font-bold text-gray-800 mb-8 text-center md:text-left">Gestión de Servicios</h1>
 
                 <div class="flex flex-col sm:flex-row justify-between items-center mb-8 gap-4">
-                    <!-- Total Pendiente -->
                     <div class="bg-gray-800 p-4 rounded-xl shadow-lg text-center text-gray-100 w-full sm:w-auto flex-grow">
                         <h2 class="text-xl font-semibold text-gray-300">Total Pendiente</h2>
                         <p id="total-pending-services" class="text-3xl font-bold text-red-400 mt-2">Bs. 0.00</p>
                         <p id="loading-pending-services" class="text-gray-400 mt-2">Calculando...</p>
                     </div>
-                    <!-- Botón Registrar Servicio -->
                     <button id="add-service-btn" class="bg-blue-800 text-white font-bold py-2 px-3 rounded-lg hover:bg-blue-900 transition-colors shadow-md flex items-center justify-center text-sm w-full sm:w-auto">
                         <i class="fas fa-plus-circle mr-2"></i> Registrar Servicio
                     </button>
                 </div>
 
-                <!-- Tabla de Servicios -->
                 <div class="bg-gray-800 p-6 rounded-xl shadow-lg">
                     <h2 class="text-2xl font-semibold mb-4 text-gray-100">Lista de Servicios</h2>
                     <div class="overflow-x-auto">
@@ -403,7 +402,6 @@
             <section id="goals-section" class="hidden">
                 <h1 class="text-4xl font-bold text-gray-800 mb-8 text-center md:text-left">Mis Objetivos</h1>
 
-                <!-- Sección de Tarjetas de Objetivos -->
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                     <!-- Tarjeta Gastos Fijos -->
                     <div class="bg-gray-800 p-6 rounded-xl shadow-lg text-center text-gray-100">
@@ -429,7 +427,6 @@
                     </div>
                 </div>
 
-                <!-- Sección de Configuración de Objetivos -->
                 <div class="bg-gray-800 p-6 rounded-xl shadow-lg mb-8">
                     <h2 class="text-2xl font-semibold text-gray-100 mb-4">Configuración de Objetivos Mensuales</h2>
                     <form id="goals-config-form" class="space-y-4">
@@ -463,7 +460,6 @@
                     </form>
                 </div>
 
-                <!-- Sección de Mapeo de gastos -->
                 <div class="bg-gray-800 p-6 rounded-xl shadow-lg">
                     <h2 class="text-2xl font-semibold text-gray-100 mb-4">Clasificar Gastos (Fijo/Variable)</h2>
                     <div class="overflow-x-auto">
@@ -490,14 +486,12 @@
             <section id="taxes-section" class="hidden">
                 <h1 class="text-4xl font-bold text-gray-800 mb-8 text-center md:text-left">Mis Impuestos (Gastos con Factura)</h1>
 
-                <!-- Tarjeta de Total a Devolver por IVA -->
                 <div class="bg-gray-800 p-6 rounded-xl shadow-lg text-center text-gray-100 mb-8">
                     <h2 class="text-xl font-semibold text-gray-300">Total RE IVA a Devolver</h2>
                     <p id="total-re-iva-return" class="text-4xl font-bold text-purple-400 mt-2">Bs. 0.00</p>
                     <p id="loading-re-iva" class="text-gray-400 mt-2">Calculando...</p>
                 </div>
 
-                <!-- Tabla de Gastos con Factura -->
                 <div class="bg-gray-800 p-6 rounded-xl shadow-lg">
                     <h2 class="text-2xl font-semibold mb-4 text-gray-100">Historial de Gastos con Factura</h2>
                     <div class="overflow-x-auto">
@@ -510,7 +504,7 @@
                                     <th class="py-3 px-4 text-left">Categoría</th>
                                     <th class="py-3 px-4 text-right">Monto Original (Bs.)</th>
                                     <th class="py-3 px-4 text-right">Total RE IVA (Bs.)</th>
-                                    <th class="py-3 px-4 text-center rounded-tr-lg">Acción</th> <!-- Nueva columna de acción -->
+                                    <th class="py-3 px-4 text-center rounded-tr-lg">Acción</th>
                                 </tr>
                             </thead>
                             <tbody id="taxes-table-body" class="text-gray-200">
@@ -522,7 +516,7 @@
                                     <td colspan="4" class="py-3 px-4 text-right font-bold">Totales:</td>
                                     <td id="total-original-amount" class="py-3 px-4 text-right font-bold">Bs. 0.00</td>
                                     <td id="total-re-iva-amount" class="py-3 px-4 text-right font-bold">Bs. 0.00</td>
-                                    <td class="py-3 px-4"></td> <!-- Celda vacía para la columna de acción -->
+                                    <td class="py-3 px-4"></td>
                                 </tr>
                             </tfoot>
                         </table>
@@ -755,7 +749,7 @@
         const navAccounts = document.getElementById('nav-accounts');
         const navServices = document.getElementById('nav-services');
         const navGoals = document.getElementById('nav-goals');
-        const navTaxes = document.getElementById('nav-taxes'); // Nuevo
+        const navTaxes = document.getElementById('nav-taxes');
         const navLogout = document.getElementById('nav-logout');
 
         const dashboardSection = document.getElementById('dashboard-section');
@@ -763,16 +757,25 @@
         const accountsSection = document.getElementById('accounts-section');
         const servicesSection = document.getElementById('services-section');
         const goalsSection = document.getElementById('goals-section');
-        const taxesSection = document.getElementById('taxes-section'); // Nuevo
+        const taxesSection = document.getElementById('taxes-section');
 
-        const totalExpensesTodayEl = document.getElementById('total-expenses-today');
-        const loadingExpensesTodayEl = document.getElementById('loading-expenses-today');
+        // Elementos del Dashboard
+        const dashboardMonthSelector = document.getElementById('dashboard-month-selector');
+        const totalExpensesMonthEl = document.getElementById('total-expenses-month');
+        const loadingExpensesMonthEl = document.getElementById('loading-expenses-month');
         const totalIncomeMonthEl = document.getElementById('total-income-month');
         const loadingIncomeMonthEl = document.getElementById('loading-income-month');
         const availableBalanceEl = document.getElementById('available-balance');
         const loadingBalanceEl = document.getElementById('loading-balance');
         const transactionsChartCtx = document.getElementById('transactionsChart').getContext('2d');
         const categoryExpensesChartCtx = document.getElementById('categoryExpensesChart').getContext('2d');
+
+        // Elementos de la sección de transacciones
+        const dailyTotalExpensesEl = document.getElementById('daily-total-expenses');
+        const loadingDailyExpensesEl = document.getElementById('loading-daily-expenses');
+        const historyAccordionContainer = document.getElementById('history-accordion-container');
+        const noTransactionsMessage = document.getElementById('no-transactions-message');
+        const loadingTransactionsEl = document.getElementById('loading-transactions');
 
         // Elementos del resumen de objetivos en Dashboard
         const dashboardSavingAchievedEl = document.getElementById('dashboard-saving-achieved');
@@ -787,20 +790,13 @@
         const transactionForm = document.getElementById('transaction-form');
         const modalTitle = document.getElementById('modal-title');
 
-        const transactionDateEl = document.getElementById('transaction-date'); // Nuevo elemento de fecha
+        const transactionDateEl = document.getElementById('transaction-date');
         const transactionTypeRadioGasto = document.getElementById('type-gasto');
         const transactionTypeRadioIngreso = document.getElementById('type-ingreso');
         const transactionAccountEl = document.getElementById('transaction-account');
         const transactionCategoryEl = document.getElementById('transaction-category');
         const transactionAmountEl = document.getElementById('transaction-amount');
         const transactionDescriptionEl = document.getElementById('transaction-description');
-
-        const monthsContainer = document.getElementById('months-container');
-        const transactionsTableBody = document.getElementById('transactions-table-body');
-        const transactionsTableContainer = document.getElementById('transactions-table-container');
-        const currentMonthTitle = document.getElementById('current-month-title');
-        const noTransactionsMessage = document.getElementById('no-transactions-message');
-        const loadingTransactionsEl = document.getElementById('loading-transactions');
 
         const accountBalancesContainer = document.getElementById('account-balances-container');
         const loadingAccountBalancesEl = document.getElementById('loading-account-balances');
@@ -867,7 +863,7 @@
         const closeSidebarBtn = document.getElementById('close-sidebar');
         const sidebar = document.querySelector('.sidebar');
 
-        // Elementos de Impuestos (Nuevos)
+        // Elementos de Impuestos
         const totalReIvaReturnEl = document.getElementById('total-re-iva-return');
         const loadingReIvaEl = document.getElementById('loading-re-iva');
         const taxesTableBody = document.getElementById('taxes-table-body');
@@ -887,13 +883,10 @@
         let editingServiceId = null;
         let transactionsChart;
         let categoryExpensesChart;
-
-        // Variable global para almacenar la inicial del usuario actual
         let currentUserInitial = null;
 
         // --- FUNCIONES DE UTILIDAD ---
 
-        // Muestra una notificación temporal
         function showNotification(message, isError = false) {
             notificationEl.textContent = message;
             notificationEl.classList.remove('hidden', 'bg-green-500', 'bg-red-500', 'opacity-0');
@@ -903,22 +896,11 @@
                 setTimeout(() => notificationEl.classList.add('hidden'), 300);
             }, 3000);
         }
-
-        // Formatea una fecha a 'DD/MM/YYYY'
-        function formatDate(dateString) {
-            const date = new Date(dateString);
-            const day = String(date.getDate()).padStart(2, '0');
-            const month = String(date.getMonth() + 1).padStart(2, '0'); // Meses son 0-indexed
-            const year = date.getFullYear();
-            return `${day}/${month}/${year}`;
-        }
-
-        // Formatea un monto a 'Bs. X.XXX,XX' (formato numérico latino)
+        
         function formatAmount(amount) {
             return `Bs. ${new Intl.NumberFormat('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(parseFloat(amount))}`;
         }
 
-        // Obtiene el mes y año actual en formato 'YYYY-MM'
         function getCurrentMonthYear() {
             const today = new Date();
             const year = today.getFullYear();
@@ -950,42 +932,35 @@
 
         // --- FUNCIONES DE AUTENTICACIÓN ---
 
-        // Muestra la sección de login y oculta el contenido principal
         function showLoginSection() {
             mainAppContent.classList.add('hidden');
             loginSection.classList.remove('hidden');
-            loginErrorMessage.classList.add('hidden'); // Ocultar mensaje de error al mostrar el login
-            loginForm.reset(); // Limpiar formulario de login
-            usernameInput.value = ""; // Asegurarse de que el select esté en la opción por defecto
+            loginErrorMessage.classList.add('hidden');
+            loginForm.reset();
+            usernameInput.value = "";
         }
 
-        // Oculta la sección de login y muestra el contenido principal
-        function showMainApp() {
+        async function showMainApp() {
             loginSection.classList.add('hidden');
             mainAppContent.classList.remove('hidden');
-            // Cargar datos iniciales del dashboard y otras secciones
             showSection('dashboard-section');
-            updateDashboardData();
+            await populateMonthSelector();
+            await updateDashboardData();
         }
 
-        // Maneja el envío del formulario de login
         function handleLoginSubmit(event) {
             event.preventDefault();
-
-            const username = usernameInput.value.trim().toUpperCase(); // Obtener valor del select
+            const username = usernameInput.value.trim().toUpperCase();
             const password = passwordInput.value;
             const rememberMe = rememberMeCheckbox.checked;
-
-            const users = {
-                "MAR": "Trasero01*",
-                "KENIN": "Trasero01*"
-            };
+            const users = { "MAR": "Trasero01*", "KENIN": "Trasero01*" };
 
             if (users[username] && users[username] === password) {
                 currentUserInitial = username === "MAR" ? "M" : "K";
                 if (rememberMe) {
                     localStorage.setItem('currentUserInitial', currentUserInitial);
                 } else {
+                    sessionStorage.setItem('currentUserInitial', currentUserInitial);
                     localStorage.removeItem('currentUserInitial');
                 }
                 showMainApp();
@@ -994,17 +969,16 @@
             }
         }
 
-        // Función para cerrar sesión
         function logout() {
             currentUserInitial = null;
             localStorage.removeItem('currentUserInitial');
+            sessionStorage.removeItem('currentUserInitial');
             showLoginSection();
             showNotification('Sesión cerrada correctamente.', false);
         }
 
         // --- FUNCIONES DE NAVEGACIÓN ---
 
-        // Cambia la sección activa
         function showSection(sectionId) {
             document.querySelectorAll('section').forEach(section => {
                 section.classList.add('hidden');
@@ -1021,42 +995,68 @@
                 activeLink.classList.remove('hover:bg-gray-700', 'hover:text-white');
             }
 
-            // Cierra la barra lateral en móvil al cambiar de sección
             if (window.innerWidth <= 768) {
                 sidebar.classList.remove('open');
             }
         }
 
         // --- FUNCIONES DE SUPABASE Y DATOS ---
+        
+        async function populateMonthSelector() {
+            try {
+                const { data, error } = await supabaseClient
+                    .from('gastos')
+                    .select('created_at');
 
-        // Calcula y muestra el total gastado hoy, total ingresos del mes y saldo disponible
+                if (error) throw error;
+
+                const monthSet = new Set();
+                data.forEach(item => {
+                    const date = new Date(item.created_at);
+                    const monthYear = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+                    monthSet.add(monthYear);
+                });
+
+                monthSet.add(getCurrentMonthYear());
+
+                const sortedMonths = Array.from(monthSet).sort().reverse();
+                
+                dashboardMonthSelector.innerHTML = '';
+                sortedMonths.forEach(monthYear => {
+                    const option = document.createElement('option');
+                    option.value = monthYear;
+                    const [year, month] = monthYear.split('-');
+                    const date = new Date(year, month - 1);
+                    option.textContent = date.toLocaleString('es-ES', { month: 'long', year: 'numeric' }).replace(/^\w/, c => c.toUpperCase());
+                    dashboardMonthSelector.appendChild(option);
+                });
+
+            } catch (error) {
+                console.error('Error populating month selector:', error.message);
+                dashboardMonthSelector.innerHTML = `<option>Error al cargar</option>`;
+            }
+        }
+
         async function updateDashboardData() {
-            loadingExpensesTodayEl.style.display = 'block';
-            totalExpensesTodayEl.style.display = 'none';
+            const selectedMonthYear = dashboardMonthSelector.value || getCurrentMonthYear();
+            
+            loadingExpensesMonthEl.style.display = 'block';
+            totalExpensesMonthEl.style.display = 'none';
             loadingIncomeMonthEl.style.display = 'block';
             totalIncomeMonthEl.style.display = 'none';
             loadingBalanceEl.style.display = 'block';
             availableBalanceEl.style.display = 'none';
 
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-            const todayISO = today.toISOString();
-
-            const tomorrow = new Date(today);
-            tomorrow.setDate(tomorrow.getDate() + 1);
-            const tomorrowISO = tomorrow.toISOString();
-
-            const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
-            const firstDayOfNextMonth = new Date(today.getFullYear(), today.getMonth() + 1, 1);
+            const [year, month] = selectedMonthYear.split('-');
+            const firstDayOfMonth = new Date(year, month - 1, 1);
+            const firstDayOfNextMonth = new Date(year, month, 1);
             const firstDayOfMonthISO = firstDayOfMonth.toISOString();
             const firstDayOfNextMonthISO = firstDayOfNextMonth.toISOString();
 
             try {
-                // Excluir transacciones que ya están en gastos_con_factura de los cálculos de gastos generales
                 const { data, error } = await supabaseClient
                     .from('gastos')
-                    .select('monto, tipo, created_at, categoria, id')
-                    .not('tipo', 'eq', 'traspaso');
+                    .select('monto, tipo, created_at, categoria, id');
 
                 if (error) throw error;
 
@@ -1068,29 +1068,19 @@
 
                 const invoicedIds = new Set(invoicedExpenses.map(item => item.original_transaction_id));
 
-                let totalExpensesToday = 0;
                 let totalIncomeMonth = 0;
                 let totalExpensesMonth = 0;
                 let totalOverallIncome = 0;
                 let totalOverallExpenses = 0;
-                const categoryExpenses = {}; // Para el nuevo gráfico de categorías
+                const categoryExpenses = {};
 
                 data.forEach(item => {
-                    // Si la transacción es un gasto y ya está marcada como facturada, no la incluimos en los gastos generales
-                    if (item.tipo === 'gasto' && invoicedIds.has(item.id)) {
-                        return; // Saltar esta transacción
-                    }
+                    const isNotInvoicedExpense = item.tipo === 'gasto' && !invoicedIds.has(item.id);
 
-                    const itemDate = new Date(item.created_at);
-
-                    if (item.tipo === 'gasto') {
+                    if (isNotInvoicedExpense) {
                         totalOverallExpenses += item.monto;
-                        if (item.created_at >= todayISO && item.created_at < tomorrowISO) {
-                            totalExpensesToday += item.monto;
-                        }
                         if (item.created_at >= firstDayOfMonthISO && item.created_at < firstDayOfNextMonthISO) {
                             totalExpensesMonth += item.monto;
-                            // Sumar gastos por categoría para el mes actual
                             if (categoryExpenses[item.categoria]) {
                                 categoryExpenses[item.categoria] += item.monto;
                             } else {
@@ -1107,25 +1097,22 @@
 
                 const availableBalance = totalOverallIncome - totalOverallExpenses;
 
-                totalExpensesTodayEl.textContent = formatAmount(totalExpensesToday);
+                totalExpensesMonthEl.textContent = formatAmount(totalExpensesMonth);
                 totalIncomeMonthEl.textContent = formatAmount(totalIncomeMonth);
                 availableBalanceEl.textContent = formatAmount(availableBalance);
 
-                // Preparar datos para el gráfico de torta (Ingresos vs Gastos totales)
                 renderTransactionsChart(totalOverallIncome, totalOverallExpenses);
-                // Renderizar el nuevo gráfico de gastos por categoría
                 renderCategoryExpensesChart(categoryExpenses);
-                // Actualizar resumen de objetivos en el dashboard
                 updateDashboardGoalsSummary(totalIncomeMonth, totalExpensesMonth);
 
             } catch (error) {
                 console.error('Error al actualizar datos del dashboard:', error.message);
-                totalExpensesTodayEl.textContent = 'Error';
+                totalExpensesMonthEl.textContent = 'Error';
                 totalIncomeMonthEl.textContent = 'Error';
                 availableBalanceEl.textContent = 'Error';
             } finally {
-                loadingExpensesTodayEl.style.display = 'none';
-                totalExpensesTodayEl.style.display = 'block';
+                loadingExpensesMonthEl.style.display = 'none';
+                totalExpensesMonthEl.style.display = 'block';
                 loadingIncomeMonthEl.style.display = 'none';
                 totalIncomeMonthEl.style.display = 'block';
                 loadingBalanceEl.style.display = 'none';
@@ -1133,344 +1120,306 @@
             }
         }
 
-        // Renderiza el gráfico de transacciones (tipo torta)
         function renderTransactionsChart(totalIncome, totalExpenses) {
             if (transactionsChart) {
-                transactionsChart.destroy(); // Destruir instancia anterior si existe
+                transactionsChart.destroy();
             }
-
-            const data = {
-                labels: ['Ingresos', 'Gastos'],
-                datasets: [{
-                    data: [totalIncome, totalExpenses],
-                    backgroundColor: ['#4CAF50', '#F44336'], // Verde para ingresos, Rojo para gastos
-                    hoverOffset: 4
-                }]
-            };
-
             transactionsChart = new Chart(transactionsChartCtx, {
-                type: 'doughnut', // Cambiado a tipo torta
-                data: data,
+                type: 'doughnut',
+                data: {
+                    labels: ['Ingresos', 'Gastos'],
+                    datasets: [{
+                        data: [totalIncome, totalExpenses],
+                        backgroundColor: ['#4ADE80', '#F87171'],
+                        hoverOffset: 4
+                    }]
+                },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: {
-                        legend: {
-                            position: 'bottom',
-                            labels: {
-                                color: '#D1D5DB' // gray-300
-                            }
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    let label = context.label || '';
-                                    if (label) {
-                                        label += ': ';
-                                    }
-                                    if (context.parsed !== null) {
-                                        label += formatAmount(context.parsed);
-                                    }
-                                    return label;
-                                }
-                            }
-                        }
+                        legend: { position: 'bottom', labels: { color: '#D1D5DB' } },
+                        tooltip: { callbacks: { label: context => `${context.label || ''}: ${formatAmount(context.parsed)}` } }
                     }
                 }
             });
         }
 
-        // Renderiza el gráfico de barras de gastos por categoría (Nuevo)
         function renderCategoryExpensesChart(categoryExpenses) {
             if (categoryExpensesChart) {
-                categoryExpensesChart.destroy(); // Destruir instancia anterior si existe
+                categoryExpensesChart.destroy();
             }
-
             const sortedCategories = Object.keys(categoryExpenses).sort((a, b) => categoryExpenses[b] - categoryExpenses[a]);
-            const labels = sortedCategories;
-            const dataValues = sortedCategories.map(cat => categoryExpenses[cat]);
-
-            const data = {
-                labels: labels,
-                datasets: [{
-                    label: 'Monto Gastado (Bs.)',
-                    data: dataValues,
-                    backgroundColor: '#FFC107', // Amarillo para las barras
-                    borderColor: '#FFA000',
-                    borderWidth: 1
-                }]
-            };
-
             categoryExpensesChart = new Chart(categoryExpensesChartCtx, {
                 type: 'bar',
-                data: data,
+                data: {
+                    labels: sortedCategories,
+                    datasets: [{
+                        label: 'Monto Gastado (Bs.)',
+                        data: sortedCategories.map(cat => categoryExpenses[cat]),
+                        backgroundColor: '#60A5FA',
+                        borderColor: '#3B82F6',
+                        borderWidth: 1
+                    }]
+                },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: {
-                        legend: {
-                            display: false
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    return `${context.dataset.label}: ${formatAmount(context.parsed.y)}`;
-                                }
-                            }
-                        }
+                        legend: { display: false },
+                        tooltip: { callbacks: { label: context => `${context.dataset.label}: ${formatAmount(context.parsed.y)}` } }
                     },
                     scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: {
-                                color: '#D1D5DB', // gray-300
-                                callback: function(value) {
-                                    return formatAmount(value);
-                                }
-                            },
-                            grid: {
-                                color: '#4B5563' // gray-700
-                            }
-                        },
-                        x: {
-                            ticks: {
-                                color: '#D1D5DB' // gray-300
-                            },
-                            grid: {
-                                display: false
-                            }
-                        }
+                        y: { beginAtZero: true, ticks: { color: '#D1D5DB', callback: value => formatAmount(value) }, grid: { color: '#4B5563' } },
+                        x: { ticks: { color: '#D1D5DB' }, grid: { display: false } }
                     }
                 }
             });
         }
 
+        async function displayDailyTotalExpenses() {
+            loadingDailyExpensesEl.style.display = 'block';
+            dailyTotalExpensesEl.style.display = 'none';
 
-        // Carga y agrupa las transacciones por mes
-        async function loadMonthlyTransactions() {
-            loadingTransactionsEl.classList.remove('hidden');
-            monthsContainer.innerHTML = ''; // Limpiar lista de meses
-            transactionsTableContainer.classList.add('hidden'); // Ocultar tabla de transacciones
+            // CORREGIDO: Usar la hora local del navegador para definir el día
+            const now = new Date();
+            const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            const endOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
 
             try {
-                const { data, error } = await supabaseClient
+                const { data: expenses, error: expensesError } = await supabaseClient
+                    .from('gastos')
+                    .select('monto, id')
+                    .eq('tipo', 'gasto')
+                    .gte('created_at', startOfDay.toISOString())
+                    .lt('created_at', endOfDay.toISOString());
+
+                if (expensesError) throw expensesError;
+
+                const expenseIds = expenses.map(e => e.id);
+                if (expenseIds.length === 0) {
+                    dailyTotalExpensesEl.textContent = formatAmount(0);
+                } else {
+                    const { data: invoicedExpenses, error: invoicedError } = await supabaseClient
+                        .from('gastos_con_factura')
+                        .select('original_transaction_id')
+                        .in('original_transaction_id', expenseIds);
+                    
+                    if (invoicedError) throw invoicedError;
+
+                    const invoicedIds = new Set(invoicedExpenses.map(item => item.original_transaction_id));
+
+                    const total = expenses
+                        .filter(expense => !invoicedIds.has(expense.id))
+                        .reduce((sum, transaction) => sum + transaction.monto, 0);
+
+                    dailyTotalExpensesEl.textContent = formatAmount(total || 0);
+                }
+            } catch (error) {
+                console.error('Error calculating daily expenses:', error.message);
+                dailyTotalExpensesEl.textContent = 'Error';
+            } finally {
+                loadingDailyExpensesEl.style.display = 'none';
+                dailyTotalExpensesEl.style.display = 'block';
+            }
+        }
+        
+        // --- Lógica para Historial de Transacciones (MEJORADA)---
+
+        const createAccordionItem = (title, contentContainer, level) => {
+            const item = document.createElement('div');
+            item.classList.add('rounded-lg', 'overflow-hidden');
+
+            const header = document.createElement('button');
+            const levelClass = level === 1 ? 'accordion-header-level-1' : 'accordion-header-level-2';
+            header.classList.add('w-full', 'p-3', 'text-left', 'font-semibold', 'text-gray-200', 'flex', 'justify-between', 'items-center', 'transition-colors', 'hover:bg-gray-600', levelClass);
+            header.innerHTML = `<span>${title}</span><i class="fas fa-chevron-down transition-transform"></i>`;
+
+            // CORREGIDO: Envolver el contenido para la animación con Grid
+            const contentWrapper = document.createElement('div');
+            contentWrapper.classList.add('accordion-grid-wrapper');
+            contentWrapper.appendChild(contentContainer);
+
+            header.addEventListener('click', () => {
+                const icon = header.querySelector('i');
+                icon.classList.toggle('rotate-180');
+                contentWrapper.classList.toggle('open');
+            });
+
+            item.appendChild(header);
+            item.appendChild(contentWrapper);
+            return item;
+        };
+
+        async function loadTransactionsHistory() {
+            loadingTransactionsEl.classList.remove('hidden');
+            historyAccordionContainer.innerHTML = '';
+            noTransactionsMessage.classList.add('hidden');
+
+            try {
+                const { data: allTransactions, error } = await supabaseClient
                     .from('gastos')
                     .select('*')
-                    .order('created_at', { ascending: false }); // Ordenar por fecha descendente
+                    .order('created_at', { ascending: false }); 
 
                 if (error) throw error;
-
-                // Obtener IDs de transacciones ya facturadas
-                const { data: invoicedExpenses, error: invoicedError } = await supabaseClient
-                    .from('gastos_con_factura')
-                    .select('original_transaction_id');
-
-                if (invoicedError) throw invoicedError;
-                const invoicedIds = new Set(invoicedExpenses.map(item => item.original_transaction_id));
-
-
-                if (data.length === 0) {
-                    monthsContainer.innerHTML = '<p class="text-gray-400 text-center">No hay transacciones registradas.</p>';
-                    loadingTransactionsEl.classList.add('hidden');
+                
+                if (allTransactions.length === 0) {
+                    noTransactionsMessage.classList.remove('hidden');
                     return;
                 }
+                
+                const { data: invoicedData, error: invoicedError } = await supabaseClient
+                    .from('gastos_con_factura')
+                    .select('original_transaction_id');
+                if (invoicedError) throw invoicedError;
+                const invoicedIds = new Set(invoicedData.map(i => i.original_transaction_id));
 
-                const groupedByMonth = data.reduce((acc, transaction) => {
-                    const date = new Date(transaction.created_at);
-                    const year = date.getFullYear();
-                    const month = date.getMonth(); // 0-indexed
-                    const monthName = new Date(year, month).toLocaleString('es-ES', { month: 'long', year: 'numeric' });
-                    const monthKey = `${year}-${String(month + 1).padStart(2, '0')}`; //YYYY-MM
-
-                    if (!acc[monthKey]) {
-                        acc[monthKey] = {
-                            name: monthName.charAt(0).toUpperCase() + monthName.slice(1), // Capitalizar primera letra
-                            transactions: []
-                        };
-                    }
-                    acc[monthKey].transactions.push(transaction);
+                const groupedByMonth = allTransactions.reduce((acc, t) => {
+                    const monthKey = t.created_at.substring(0, 7);
+                    if (!acc[monthKey]) acc[monthKey] = [];
+                    acc[monthKey].push(t);
                     return acc;
                 }, {});
 
-                // Ordenar los meses de forma descendente
                 const sortedMonthKeys = Object.keys(groupedByMonth).sort().reverse();
 
-                sortedMonthKeys.forEach(monthKey => {
-                    const monthData = groupedByMonth[monthKey];
-                    const monthDiv = document.createElement('div');
-                    monthDiv.classList.add('bg-gray-700', 'p-4', 'rounded-lg', 'shadow-sm', 'cursor-pointer', 'hover:bg-gray-600', 'transition-colors', 'flex', 'justify-between', 'items-center', 'text-gray-200');
-                    monthDiv.innerHTML = `
-                        <span class="font-semibold">${monthData.name}</span>
-                        <i class="fas fa-chevron-down text-gray-400"></i>
-                    `;
-                    monthDiv.dataset.monthKey = monthKey;
-                    monthDiv.addEventListener('click', () => toggleMonthTransactions(monthKey, monthData.transactions, invoicedIds));
-                    monthsContainer.appendChild(monthDiv);
+                for (const monthKey of sortedMonthKeys) {
+                    const monthTransactions = groupedByMonth[monthKey];
+                    const monthDate = new Date(monthKey + '-02T00:00:00');
+                    const monthTitle = monthDate.toLocaleString('es-ES', { month: 'long', year: 'numeric' }).replace(/^\w/, c => c.toUpperCase());
+                    
+                    const monthContent = document.createElement('div');
+                    monthContent.classList.add('p-2', 'space-y-2');
+                    
+                    const groupedByDay = monthTransactions.reduce((acc, t) => {
+                        const dayKey = t.created_at.split('T')[0];
+                        if (!acc[dayKey]) acc[dayKey] = [];
+                        acc[dayKey].push(t);
+                        return acc;
+                    }, {});
+
+                    const sortedDayKeys = Object.keys(groupedByDay).sort().reverse();
+
+                    for (const dayKey of sortedDayKeys) {
+                        const dayTransactions = groupedByDay[dayKey];
+                        const dayDate = new Date(dayKey.replace(/-/g, '\/'));
+                        const dayTitle = dayDate.toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }).replace(/^\w/, c => c.toUpperCase());
+                        
+                        const dayContent = document.createElement('div');
+                        dayContent.classList.add('accordion-content', 'p-2');
+                        
+                        const tableContainer = document.createElement('div');
+                        tableContainer.classList.add('overflow-x-auto');
+                        const table = document.createElement('table');
+                        table.classList.add('min-w-full', 'divide-y', 'divide-gray-600');
+                        table.innerHTML = `
+                            <thead class="bg-gray-700">
+                                <tr>
+                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Tipo</th>
+                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Cuenta</th>
+                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Categoría</th>
+                                    <th class="px-4 py-2 text-right text-xs font-medium text-gray-300 uppercase tracking-wider">Monto</th>
+                                    <th class="px-4 py-2 text-center text-xs font-medium text-gray-300 uppercase tracking-wider">Usuario</th>
+                                    <th class="px-4 py-2 text-center text-xs font-medium text-gray-300 uppercase tracking-wider">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-700"></tbody>
+                        `;
+                        const tbody = table.querySelector('tbody');
+
+                        dayTransactions.reverse().forEach(t => {
+                            const row = tbody.insertRow();
+                            row.classList.add('hover:bg-gray-600');
+                            const typeColor = t.tipo === 'ingreso' ? 'text-green-400' : 'text-red-400';
+                            const typeText = t.tipo.charAt(0).toUpperCase() + t.tipo.slice(1);
+                            const accountDisplay = t.tipo === 'traspaso' ? `${t.cuenta} <i class="fas fa-arrow-right text-gray-500 mx-1"></i> ${t.target_cuenta || 'N/A'}` : t.cuenta;
+                            const isExpense = t.tipo === 'gasto';
+                            const isInvoiced = invoicedIds.has(t.id);
+                            const facturaButtonHtml = isExpense
+                                ? `<button class="invoice-btn bg-purple-600 text-white p-2 rounded-full hover:bg-purple-700 transition-colors shadow-md ${isInvoiced ? 'opacity-50 cursor-not-allowed' : ''}" data-id="${t.id}" ${isInvoiced ? 'disabled' : ''} title="Marcar con Factura">
+                                    <i class="fas fa-file-invoice fa-fw"></i>
+                                   </button>`
+                                : '<span class="inline-block w-9 h-9"></span>';
+
+                            row.innerHTML = `
+                                <td class="px-4 py-2 whitespace-nowrap"><span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${t.tipo === 'ingreso' ? 'bg-green-900 text-green-100' : 'bg-red-900 text-red-100'}">${typeText}</span></td>
+                                <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-300">${accountDisplay}</td>
+                                <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-300">${t.categoria}</td>
+                                <td class="px-4 py-2 whitespace-nowrap text-sm text-right font-medium ${typeColor}">${formatAmount(t.monto)}</td>
+                                <td class="px-4 py-2 whitespace-nowrap text-center text-sm text-gray-400">${t.user_initial || 'N/A'}</td>
+                                <td class="px-4 py-2 whitespace-nowrap text-center text-sm font-medium">
+                                    <div class="flex items-center justify-center space-x-2">
+                                        <button class="edit-btn bg-blue-600 text-white p-2 rounded-full hover:bg-blue-700 transition-colors shadow-md" data-id="${t.id}" title="Editar"><i class="fas fa-edit fa-fw"></i></button>
+                                        <button class="delete-btn bg-red-600 text-white p-2 rounded-full hover:bg-red-700 transition-colors shadow-md" data-id="${t.id}" title="Eliminar"><i class="fas fa-trash-alt fa-fw"></i></button>
+                                        ${facturaButtonHtml}
+                                    </div>
+                                </td>
+                            `;
+                        });
+                        tableContainer.appendChild(table);
+                        dayContent.appendChild(tableContainer);
+                        const dayItem = createAccordionItem(dayTitle, dayContent, 2);
+                        monthContent.appendChild(dayItem);
+                    }
+                    const monthItem = createAccordionItem(monthTitle, monthContent, 1);
+                    historyAccordionContainer.appendChild(monthItem);
+                }
+
+                historyAccordionContainer.querySelectorAll('.edit-btn').forEach(b => b.onclick = (e) => editTransaction(e.currentTarget.dataset.id));
+                historyAccordionContainer.querySelectorAll('.delete-btn').forEach(b => b.onclick = (e) => deleteTransaction(e.currentTarget.dataset.id));
+                historyAccordionContainer.querySelectorAll('.invoice-btn').forEach(b => b.onclick = async (e) => {
+                    const id = e.currentTarget.dataset.id;
+                    const {data} = await supabaseClient.from('gastos').select('*').eq('id', id).single();
+                    if(data) markAsInvoiced(data);
                 });
 
-            } catch (error) {
-                console.error('Error al cargar transacciones mensuales:', error.message);
-                monthsContainer.innerHTML = '<p class="text-red-400 text-center">Error al cargar transacciones.</p>';
+            } catch(error) {
+                console.error('Error loading transaction history:', error.message);
+                historyAccordionContainer.innerHTML = `<p class="text-red-400 text-center">Error al cargar el historial.</p>`;
             } finally {
                 loadingTransactionsEl.classList.add('hidden');
             }
         }
 
-        // Muestra u oculta las transacciones de un mes específico
-        function toggleMonthTransactions(monthKey, transactions, invoicedIds) {
-            currentMonthTitle.textContent = `Transacciones de ${new Date(monthKey).toLocaleString('es-ES', { month: 'long', year: 'numeric' }).charAt(0).toUpperCase() + new Date(monthKey).toLocaleString('es-ES', { month: 'long', year: 'numeric' }).slice(1)}`;
-            transactionsTableBody.innerHTML = ''; // Limpiar tabla
 
-            if (transactions.length === 0) {
-                noTransactionsMessage.classList.remove('hidden');
-                transactionsTableContainer.classList.remove('hidden');
-                return;
-            } else {
-                noTransactionsMessage.classList.add('hidden');
-            }
-
-            transactions.forEach(transaction => {
-                const row = document.createElement('tr');
-                row.classList.add('border-b', 'border-gray-600', 'hover:bg-gray-600');
-
-                let typeText = '';
-                let typeColorClass = '';
-                if (transaction.tipo === 'ingreso') {
-                    typeText = 'Ingreso';
-                    typeColorClass = 'bg-green-700 text-green-100';
-                } else if (transaction.tipo === 'gasto') {
-                    typeText = 'Gasto';
-                    typeColorClass = 'bg-red-700 text-red-100';
-                } else if (transaction.tipo === 'traspaso') {
-                    typeText = 'Traspaso';
-                    typeColorClass = 'bg-blue-700 text-blue-100';
-                }
-
-                // Mostrar cuenta de destino si es traspaso
-                const accountDisplay = transaction.tipo === 'traspaso'
-                    ? `${transaction.cuenta} <i class="fas fa-arrow-right text-gray-400 mx-1"></i> ${transaction.target_cuenta || 'N/A'}`
-                    : transaction.cuenta || 'N/A';
-
-                // La categoría para traspasos puede ser "Traspaso" o la descripción
-                const categoryDisplay = transaction.tipo === 'traspaso' ? 'Traspaso' : transaction.categoria || 'N/A';
-
-                // Determinar si el botón "Con Factura" debe estar visible o deshabilitado
-                const isExpense = transaction.tipo === 'gasto';
-                const isInvoiced = invoicedIds.has(transaction.id);
-                const facturaButtonHtml = isExpense
-                    ? `<button class="invoice-btn bg-purple-600 text-white p-1 rounded-full hover:bg-purple-700 transition-colors shadow-md text-sm ${isInvoiced ? 'opacity-50 cursor-not-allowed' : ''}" data-id="${transaction.id}" ${isInvoiced ? 'disabled' : ''}>
-                        <i class="fas fa-file-invoice"></i>
-                       </button>`
-                    : '';
-
-                row.innerHTML = `
-                    <td class="py-3 px-4">${formatDate(transaction.created_at)}</td>
-                    <td class="py-3 px-4">
-                        <span class="px-2 py-1 rounded-full text-xs font-semibold ${typeColorClass}">
-                            ${typeText}
-                        </span>
-                    </td>
-                    <td class="py-3 px-4">${accountDisplay}</td>
-                    <td class="py-3 px-4">${categoryDisplay}</td>
-                    <td class="py-3 px-4 text-right ${transaction.tipo === 'ingreso' ? 'text-green-400' : 'text-red-400'} font-medium">${formatAmount(transaction.monto)}</td>
-                    <td class="py-3 px-4 text-center">${transaction.user_initial || 'N/A'}</td> <!-- Mostrar inicial del usuario -->
-                    <td class="py-3 px-4 text-center flex items-center justify-center space-x-2">
-                        <button class="edit-btn bg-blue-600 text-white p-2 rounded-full hover:bg-blue-700 transition-colors shadow-md" data-id="${transaction.id}">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        <button class="delete-btn bg-red-600 text-white p-2 rounded-full hover:bg-red-700 transition-colors shadow-md" data-id="${transaction.id}">
-                            <i class="fas fa-trash-alt"></i>
-                        </button>
-                        ${facturaButtonHtml}
-                    </td>
-                `;
-                transactionsTableBody.appendChild(row);
-            });
-
-            transactionsTableContainer.classList.remove('hidden');
-
-            // Añadir event listeners para botones de editar y eliminar
-            document.querySelectorAll('.edit-btn').forEach(button => {
-                button.addEventListener('click', (event) => {
-                    const id = event.currentTarget.dataset.id;
-                    editTransaction(id, transactions);
-                });
-            });
-
-            document.querySelectorAll('.delete-btn').forEach(button => {
-                button.addEventListener('click', (event) => {
-                    const id = event.currentTarget.dataset.id;
-                    deleteTransaction(id);
-                });
-            });
-
-            // Añadir event listeners para el nuevo botón "Con Factura"
-            document.querySelectorAll('.invoice-btn').forEach(button => {
-                button.addEventListener('click', (event) => {
-                    const id = event.currentTarget.dataset.id;
-                    const transactionToInvoice = transactions.find(t => t.id == id);
-                    if (transactionToInvoice) {
-                        markAsInvoiced(transactionToInvoice);
-                    }
-                });
-            });
-        }
-
-        // Abre el modal para añadir/editar transacción
-        function openTransactionModal(transaction = null) {
+        async function openTransactionModal(transaction = null) {
             transactionForm.reset();
             editingTransactionId = null;
             modalTitle.textContent = 'Añadir Nueva Transacción';
 
-            // Establecer la fecha actual por defecto para nuevas transacciones
             const today = new Date();
             const year = today.getFullYear();
             const month = String(today.getMonth() + 1).padStart(2, '0');
             const day = String(today.getDate()).padStart(2, '0');
             transactionDateEl.value = `${year}-${month}-${day}`;
 
-            // Reset radio buttons
             transactionTypeRadioGasto.checked = true;
             transactionTypeRadioIngreso.checked = false;
 
             if (transaction) {
                 modalTitle.textContent = 'Editar Transacción';
                 editingTransactionId = transaction.id;
-
-                // Establecer la fecha de la transacción existente
                 const transactionDate = new Date(transaction.created_at);
-                const transYear = transactionDate.getFullYear();
-                const transMonth = String(transactionDate.getMonth() + 1).padStart(2, '0');
-                const transDay = String(transactionDate.getDate()).padStart(2, '0');
-                transactionDateEl.value = `${transYear}-${transMonth}-${transDay}`;
-
-
-                if (transaction.tipo === 'gasto') {
-                    transactionTypeRadioGasto.checked = true;
-                } else if (transaction.tipo === 'ingreso') {
-                    transactionTypeRadioIngreso.checked = true;
-                }
-
+                transactionDateEl.value = transactionDate.toISOString().split('T')[0];
+                if (transaction.tipo === 'gasto') transactionTypeRadioGasto.checked = true;
+                else if (transaction.tipo === 'ingreso') transactionTypeRadioIngreso.checked = true;
                 transactionAccountEl.value = transaction.cuenta || '';
                 transactionCategoryEl.value = transaction.categoria || '';
                 transactionAmountEl.value = transaction.monto;
                 transactionDescriptionEl.value = transaction.descripcion || '';
             }
-
             transactionModal.classList.remove('hidden');
         }
 
-        // Cierra el modal de transacción
         function closeTransactionModal() {
             transactionModal.classList.add('hidden');
         }
 
-        // Maneja el envío del formulario de transacción (añadir/editar)
         async function handleTransactionSubmit(event) {
             event.preventDefault();
-
-            const date = transactionDateEl.value; // Obtener la fecha
-            const type = document.querySelector('input[name="transaction_type_radio"]:checked').value; // Obtener valor del radio button
+            const date = transactionDateEl.value;
+            const type = document.querySelector('input[name="transaction_type_radio"]:checked').value;
             const account = transactionAccountEl.value;
             const category = transactionCategoryEl.value;
             const amount = parseFloat(transactionAmountEl.value);
@@ -1487,39 +1436,18 @@
 
             try {
                 let response;
-                // Si es un nuevo gasto, inicializar tipo_gasto como 'no_clasificado'
                 const tipoGasto = (type === 'gasto' && !editingTransactionId) ? 'no_clasificado' : undefined;
 
                 if (editingTransactionId) {
-                    // Actualizar transacción existente
-                    const updateData = {
-                        created_at: new Date(date).toISOString(), // Usar la fecha seleccionada
-                        tipo: type,
-                        cuenta: account,
-                        categoria: category,
-                        monto: amount,
-                        descripcion: description
-                        // user_initial no se actualiza al editar, se mantiene el original
-                    };
                     response = await supabaseClient
                         .from('gastos')
-                        .update(updateData)
+                        .update({ created_at: new Date(date).toISOString(), tipo: type, cuenta: account, categoria: category, monto: amount, descripcion: description })
                         .eq('id', editingTransactionId)
                         .select();
                 } else {
-                    // Añadir nueva transacción
                     response = await supabaseClient
                         .from('gastos')
-                        .insert([{
-                            created_at: new Date(date).toISOString(), // Usar la fecha seleccionada
-                            tipo: type,
-                            cuenta: account,
-                            categoria: category,
-                            monto: amount,
-                            descripcion: description,
-                            tipo_gasto: tipoGasto, // Solo para nuevos gastos
-                            user_initial: currentUserInitial // Añadir la inicial del usuario
-                        }])
+                        .insert([{ created_at: new Date(date).toISOString(), tipo: type, cuenta: account, categoria: category, monto: amount, descripcion: description, tipo_gasto: tipoGasto, user_initial: currentUserInitial }])
                         .select();
                 }
 
@@ -1528,24 +1456,16 @@
 
                 showNotification(editingTransactionId ? 'Transacción actualizada con éxito.' : 'Transacción añadida con éxito.');
                 closeTransactionModal();
-                updateDashboardData(); // Actualizar datos del dashboard
-                // Recargar el historial solo si estamos en la sección de transacciones
-                if (!transactionsSection.classList.contains('hidden')) {
-                    loadMonthlyTransactions();
-                }
-                // Recargar saldos de cuentas si estamos en esa sección
-                if (!accountsSection.classList.contains('hidden')) {
-                    loadAccountBalances();
-                }
-                // Recargar datos de objetivos si estamos en esa sección
-                if (!goalsSection.classList.contains('hidden')) {
-                    loadGoalsData();
-                }
-                // Recargar datos de impuestos si estamos en esa sección
-                if (!taxesSection.classList.contains('hidden')) {
-                    loadTaxesData();
-                }
-
+                
+                // Recargar todo para mantener la consistencia
+                await populateMonthSelector();
+                await updateDashboardData();
+                await displayDailyTotalExpenses();
+                await loadTransactionsHistory();
+                
+                if (!accountsSection.classList.contains('hidden')) loadAccountBalances();
+                if (!goalsSection.classList.contains('hidden')) loadGoalsData();
+                if (!taxesSection.classList.contains('hidden')) loadTaxesData();
 
             } catch (error) {
                 console.error('Error al guardar la transacción:', error.message);
@@ -1553,22 +1473,29 @@
             }
         }
 
-        // Edita una transacción existente
-        async function editTransaction(id, allTransactions) {
-            const transactionToEdit = allTransactions.find(t => t.id == id);
-            if (transactionToEdit) {
-                // Si es un traspaso, no se puede editar con este modal
-                if (transactionToEdit.tipo === 'traspaso') {
-                    showNotification('Los traspasos deben editarse desde la sección de Saldo de Cuentas.', true);
+        async function editTransaction(id) {
+             const { data, error } = await supabaseClient
+                .from('gastos')
+                .select('*')
+                .eq('id', id)
+                .single();
+            
+            if (error) {
+                showNotification('Error al buscar la transacción.', true);
+                return;
+            }
+
+            if (data) {
+                if (data.tipo === 'traspaso') {
+                    showNotification('Los traspasos no se pueden editar desde aquí.', true);
                     return;
                 }
-                openTransactionModal(transactionToEdit);
+                openTransactionModal(data);
             } else {
                 showNotification('Transacción no encontrada.', true);
             }
         }
 
-        // Elimina una transacción
         async function deleteTransaction(id) {
             const confirmDelete = await new Promise(resolve => {
                 const modal = document.createElement('div');
@@ -1584,73 +1511,87 @@
                     </div>
                 `;
                 document.body.appendChild(modal);
-
-                document.getElementById('confirm-yes').addEventListener('click', () => {
-                    modal.remove();
-                    resolve(true);
-                });
-                document.getElementById('confirm-no').addEventListener('click', () => {
-                    modal.remove();
-                    resolve(false);
-                });
+                document.getElementById('confirm-yes').onclick = () => { modal.remove(); resolve(true); };
+                document.getElementById('confirm-no').onclick = () => { modal.remove(); resolve(false); };
             });
 
-            if (!confirmDelete) {
-                return;
-            }
+            if (!confirmDelete) return;
 
             try {
-                const { error } = await supabaseClient
-                    .from('gastos')
-                    .delete()
-                    .eq('id', id);
-
-                if (error) throw error;
-
-                // También eliminar de gastos_con_factura si existe
-                await supabaseClient
-                    .from('gastos_con_factura')
-                    .delete()
-                    .eq('original_transaction_id', id);
+                await supabaseClient.from('gastos').delete().eq('id', id);
+                await supabaseClient.from('gastos_con_factura').delete().eq('original_transaction_id', id);
 
                 showNotification('Transacción eliminada con éxito.');
-                updateDashboardData(); // Actualizar datos del dashboard
-                // Recargar el historial solo si estamos en la sección de transacciones
-                if (!transactionsSection.classList.contains('hidden')) {
-                    loadMonthlyTransactions();
-                }
-                // Recargar saldos de cuentas si estamos en esa sección
-                if (!accountsSection.classList.contains('hidden')) {
-                    loadAccountBalances();
-                }
-                // Recargar servicios si estamos en esa sección (por si se eliminó un gasto de servicio)
-                if (!servicesSection.classList.contains('hidden')) {
-                    loadServices();
-                }
-                // Recargar datos de objetivos si estamos en esa sección
-                if (!goalsSection.classList.contains('hidden')) {
-                    loadGoalsData();
-                }
-                // Recargar datos de impuestos si estamos en esa sección
-                if (!taxesSection.classList.contains('hidden')) {
-                    loadTaxesData();
-                }
+                
+                await populateMonthSelector();
+                await updateDashboardData();
+                await displayDailyTotalExpenses();
+                await loadTransactionsHistory();
+
+                if (!accountsSection.classList.contains('hidden')) loadAccountBalances();
+                if (!servicesSection.classList.contains('hidden')) loadServices();
+                if (!goalsSection.classList.contains('hidden')) loadGoalsData();
+                if (!taxesSection.classList.contains('hidden')) loadTaxesData();
             } catch (error) {
                 console.error('Error al eliminar la transacción:', error.message);
                 showNotification('Error al eliminar la transacción.', true);
             }
         }
+        
+        // --- EVENT LISTENERS ---
 
-        // --- FUNCIONES DE SALDO DE CUENTAS Y TRASPASOS ---
+        loginForm.addEventListener('submit', handleLoginSubmit);
+        themeToggleBtn.addEventListener('click', toggleTheme);
+        dashboardMonthSelector.addEventListener('change', updateDashboardData);
 
-        // Carga y muestra los saldos de cada cuenta
+        navDashboard.addEventListener('click', async (e) => {
+            e.preventDefault();
+            showSection('dashboard-section');
+            await populateMonthSelector();
+            await updateDashboardData();
+        });
+
+        navTransactions.addEventListener('click', (e) => {
+            e.preventDefault();
+            showSection('transactions-section');
+            displayDailyTotalExpenses();
+            loadTransactionsHistory();
+        });
+        
+        navAccounts.addEventListener('click', (e) => { e.preventDefault(); showSection('accounts-section'); loadAccountBalances(); });
+        navServices.addEventListener('click', (e) => { e.preventDefault(); showSection('services-section'); loadServices(); });
+        navGoals.addEventListener('click', (e) => { e.preventDefault(); showSection('goals-section'); loadGoalsData(); });
+        navTaxes.addEventListener('click', (e) => { e.preventDefault(); showSection('taxes-section'); loadTaxesData(); });
+        navLogout.addEventListener('click', (e) => { e.preventDefault(); logout(); });
+
+        addTransactionBtn.addEventListener('click', () => openTransactionModal());
+        closeModalBtn.addEventListener('click', closeTransactionModal);
+        transactionModal.addEventListener('click', (e) => { if (e.target === transactionModal) closeTransactionModal(); });
+        transactionForm.addEventListener('submit', handleTransactionSubmit);
+
+        openSidebarBtn.addEventListener('click', () => sidebar.classList.add('open'));
+        closeSidebarBtn.addEventListener('click', () => sidebar.classList.remove('open'));
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            applyTheme(savedTheme);
+
+            const storedInitial = localStorage.getItem('currentUserInitial') || sessionStorage.getItem('currentUserInitial');
+            if (storedInitial) {
+                currentUserInitial = storedInitial;
+                showMainApp();
+            } else {
+                showLoginSection();
+            }
+        });
+        
         async function loadAccountBalances() {
             loadingAccountBalancesEl.classList.remove('hidden');
-            accountBalancesContainer.innerHTML = ''; // Limpiar contenedor
+            accountBalancesContainer.innerHTML = ''; 
 
             const accounts = ["Efectivo", "Banco Union", "BNB", "Banco Fie", "Mercantil"];
             const balances = {};
-            accounts.forEach(account => balances[account] = 0); // Inicializar todos los saldos a 0
+            accounts.forEach(account => balances[account] = 0);
 
             try {
                 const { data, error } = await supabaseClient
@@ -1663,26 +1604,17 @@
                     if (transaction.tipo === 'ingreso') {
                         if (balances[transaction.cuenta] !== undefined) {
                             balances[transaction.cuenta] += transaction.monto;
-                        } else {
-                            console.warn(`Cuenta '${transaction.cuenta}' no inicializada para ingreso.`);
                         }
                     } else if (transaction.tipo === 'gasto') {
                         if (balances[transaction.cuenta] !== undefined) {
                             balances[transaction.cuenta] -= transaction.monto;
-                        } else {
-                            console.warn(`Cuenta '${transaction.cuenta}' no inicializada para gasto.`);
                         }
                     } else if (transaction.tipo === 'traspaso') {
-                        // Restar de la cuenta de origen y sumar a la de destino
                         if (balances[transaction.cuenta] !== undefined) {
                             balances[transaction.cuenta] -= transaction.monto;
-                        } else {
-                            console.warn(`Cuenta de origen '${transaction.cuenta}' no inicializada para traspaso.`);
                         }
                         if (transaction.target_cuenta && balances[transaction.target_cuenta] !== undefined) {
                             balances[transaction.target_cuenta] += transaction.monto;
-                        } else {
-                            console.warn(`Cuenta de destino '${transaction.target_cuenta}' no inicializada o nula para traspaso.`);
                         }
                     }
                 });
@@ -1705,1246 +1637,207 @@
                 loadingAccountBalancesEl.classList.add('hidden');
             }
         }
-
-        // Abre el modal para registrar traspaso
-        function openTransferModal() {
-            transferForm.reset();
-            transferDateEl.valueAsDate = new Date(); // Establecer fecha actual por defecto
-            transferModal.classList.remove('hidden');
-        }
-
-        // Cierra el modal de traspaso
-        function closeTransferModal() {
-            transferModal.classList.add('hidden');
-        }
-
-        // Maneja el envío del formulario de traspaso
+        function openTransferModal() { transferForm.reset(); transferDateEl.valueAsDate = new Date(); transferModal.classList.remove('hidden'); }
+        function closeTransferModal() { transferModal.classList.add('hidden'); }
         async function handleTransferSubmit(event) {
             event.preventDefault();
-
             const date = transferDateEl.value;
             const fromAccount = transferFromAccountEl.value;
             const toAccount = transferToAccountEl.value;
             const amount = parseFloat(transferAmountEl.value);
             const description = transferDescriptionEl.value;
-
-            if (!date || !fromAccount || !toAccount || isNaN(amount) || amount <= 0) {
-                showNotification('Por favor, completa todos los campos obligatorios y asegúrate que el monto sea válido.', true);
-                return;
-            }
-
-            if (fromAccount === toAccount) {
-                showNotification('La cuenta de origen y destino no pueden ser la misma.', true);
-                return;
-            }
-            if (!currentUserInitial) {
-                showNotification('Error: No hay usuario logueado. Por favor, inicia sesión.', true);
-                return;
-            }
-
+            if (!date || !fromAccount || !toAccount || isNaN(amount) || amount <= 0) { showNotification('Por favor, completa todos los campos obligatorios.', true); return; }
+            if (fromAccount === toAccount) { showNotification('La cuenta de origen y destino no pueden ser la misma.', true); return; }
+            if (!currentUserInitial) { showNotification('Error: No hay usuario logueado.', true); return; }
             try {
-                const { error } = await supabaseClient
-                    .from('gastos')
-                    .insert([{
-                        created_at: new Date(date).toISOString(), // Usar la fecha seleccionada
-                        tipo: 'traspaso',
-                        cuenta: fromAccount,
-                        target_cuenta: toAccount,
-                        categoria: 'Traspaso', // Categoría fija para traspasos
-                        monto: amount,
-                        descripcion: description,
-                        user_initial: currentUserInitial // Añadir la inicial del usuario
-                    }]);
-
+                const { error } = await supabaseClient.from('gastos').insert([{ created_at: new Date(date).toISOString(), tipo: 'traspaso', cuenta: fromAccount, target_cuenta: toAccount, categoria: 'Traspaso', monto: amount, descripcion: description, user_initial: currentUserInitial }]);
                 if (error) throw error;
-
                 showNotification('Traspaso registrado con éxito.');
                 closeTransferModal();
-                loadAccountBalances(); // Recargar saldos de cuentas
-                // Recargar el historial si estamos en la sección de transacciones
-                if (!transactionsSection.classList.contains('hidden')) {
-                    loadMonthlyTransactions();
-                }
-                // Recargar datos de objetivos si estamos en esa sección
-                if (!goalsSection.classList.contains('hidden')) {
-                    loadGoalsData();
-                }
-            } catch (error) {
-                console.error('Error al registrar el traspaso:', error.message);
-                showNotification('Error al registrar el traspaso.', true);
-            }
+                loadAccountBalances();
+                if (!transactionsSection.classList.contains('hidden')) loadTransactionsHistory();
+                if (!goalsSection.classList.contains('hidden')) loadGoalsData();
+            } catch (error) { console.error('Error al registrar el traspaso:', error.message); showNotification('Error al registrar el traspaso.', true); }
         }
-
-        // --- FUNCIONES DE GESTIÓN DE SERVICIOS ---
-
-        // Carga y muestra los servicios
         async function loadServices() {
-            loadingServicesEl.classList.remove('hidden');
-            servicesTableBody.innerHTML = ''; // Limpiar tabla
-            noServicesMessage.classList.add('hidden');
-            totalPendingServicesEl.textContent = formatAmount(0); // Reset total pendiente
-
+            loadingServicesEl.classList.remove('hidden'); servicesTableBody.innerHTML = ''; noServicesMessage.classList.add('hidden'); totalPendingServicesEl.textContent = formatAmount(0);
             try {
-                const { data, error } = await supabaseClient
-                    .from('servicios')
-                    .select('*')
-                    .order('fecha_vencimiento', { ascending: true }); // Ordenar por fecha de vencimiento
-
+                const { data, error } = await supabaseClient.from('servicios').select('*').order('fecha_vencimiento', { ascending: true });
                 if (error) throw error;
-
-                if (data.length === 0) {
-                    noServicesMessage.classList.remove('hidden');
-                    loadingServicesEl.classList.add('hidden');
-                    return;
-                }
-
+                if (data.length === 0) { noServicesMessage.classList.remove('hidden'); loadingServicesEl.classList.add('hidden'); return; }
                 let totalPending = 0;
                 data.forEach(service => {
-                    const row = document.createElement('tr');
-                    row.classList.add('border-b', 'border-gray-600', 'hover:bg-gray-600');
-
+                    const row = document.createElement('tr'); row.classList.add('border-b', 'border-gray-600', 'hover:bg-gray-600');
                     const statusClass = service.estado === 'pendiente' ? 'bg-yellow-700 text-yellow-100' : 'bg-green-700 text-green-100';
-                    const actionButtons = service.estado === 'pendiente' ?
-                        `<button class="pay-service-btn bg-blue-600 text-white p-2 rounded-full hover:bg-blue-700 transition-colors mr-2 shadow-md" data-id="${service.id}" data-amount="${service.monto}" data-name="${service.nombre_servicio}">
-                            <i class="fas fa-dollar-sign"></i> Pagar
-                        </button>` :
-                        `<button class="revert-service-btn bg-orange-600 text-white p-2 rounded-full hover:bg-orange-700 transition-colors mr-2 shadow-md" data-id="${service.id}">
-                            <i class="fas fa-undo"></i> Revertir
-                        </button>`;
-
-                    row.innerHTML = `
-                        <td class="py-3 px-4">${service.nombre_servicio}</td>
-                        <td class="py-3 px-4">${formatDate(service.fecha_vencimiento)}</td>
-                        <td class="py-3 px-4 text-right">${formatAmount(service.monto)}</td>
-                        <td class="py-3 px-4 text-center">
-                            <span class="px-2 py-1 rounded-full text-xs font-semibold ${statusClass}">
-                                ${service.estado.charAt(0).toUpperCase() + service.estado.slice(1)}
-                            </span>
-                        </td>
-                        <td class="py-3 px-4 text-center">
-                            ${actionButtons}
-                            <button class="edit-service-btn bg-blue-600 text-white p-2 rounded-full hover:bg-blue-700 transition-colors mr-2 shadow-md" data-id="${service.id}">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button class="delete-service-btn bg-red-600 text-white p-2 rounded-full hover:bg-red-700 transition-colors shadow-md" data-id="${service.id}">
-                                <i class="fas fa-trash-alt"></i>
-                            </button>
-                        </td>
-                    `;
+                    const actionButtons = service.estado === 'pendiente' ? `<button class="pay-service-btn bg-blue-600 text-white p-2 rounded-full hover:bg-blue-700 transition-colors mr-2 shadow-md" data-id="${service.id}" data-amount="${service.monto}" data-name="${service.nombre_servicio}"><i class="fas fa-dollar-sign"></i> Pagar</button>` : `<button class="revert-service-btn bg-orange-600 text-white p-2 rounded-full hover:bg-orange-700 transition-colors mr-2 shadow-md" data-id="${service.id}"><i class="fas fa-undo"></i> Revertir</button>`;
+                    row.innerHTML = `<td class="py-3 px-4">${service.nombre_servicio}</td><td class="py-3 px-4">${new Date(service.fecha_vencimiento).toLocaleDateString('es-ES')}</td><td class="py-3 px-4 text-right">${formatAmount(service.monto)}</td><td class="py-3 px-4 text-center"><span class="px-2 py-1 rounded-full text-xs font-semibold ${statusClass}">${service.estado.charAt(0).toUpperCase() + service.estado.slice(1)}</span></td><td class="py-3 px-4 text-center">${actionButtons}<button class="edit-service-btn bg-blue-600 text-white p-2 rounded-full hover:bg-blue-700 transition-colors mr-2 shadow-md" data-id="${service.id}"><i class="fas fa-edit"></i></button><button class="delete-service-btn bg-red-600 text-white p-2 rounded-full hover:bg-red-700 transition-colors shadow-md" data-id="${service.id}"><i class="fas fa-trash-alt"></i></button></td>`;
                     servicesTableBody.appendChild(row);
-
-                    if (service.estado === 'pendiente') {
-                        totalPending += service.monto;
-                    }
+                    if (service.estado === 'pendiente') totalPending += service.monto;
                 });
                 totalPendingServicesEl.textContent = formatAmount(totalPending);
-
-                // Añadir event listeners para botones de acción
-                document.querySelectorAll('.pay-service-btn').forEach(button => {
-                    button.addEventListener('click', (event) => {
-                        const id = event.currentTarget.dataset.id;
-                        const amount = event.currentTarget.dataset.amount;
-                        const name = event.currentTarget.dataset.name;
-                        openPayServiceModal(id, amount, name);
-                    });
-                });
-                document.querySelectorAll('.revert-service-btn').forEach(button => {
-                    button.addEventListener('click', (event) => {
-                        const id = event.currentTarget.dataset.id;
-                        revertServiceStatus(id);
-                    });
-                });
-                document.querySelectorAll('.edit-service-btn').forEach(button => {
-                    button.addEventListener('click', (event) => {
-                        const id = event.currentTarget.dataset.id;
-                        editService(id, data); // Pasar todos los datos para encontrar el servicio
-                    });
-                });
-                document.querySelectorAll('.delete-service-btn').forEach(button => {
-                    button.addEventListener('click', (event) => {
-                        const id = event.currentTarget.dataset.id;
-                        deleteService(id);
-                    });
-                });
-
-            } catch (error) {
-                console.error('Error al cargar servicios:', error.message);
-                servicesTableBody.innerHTML = '<tr><td colspan="5" class="text-red-400 text-center py-4">Error al cargar servicios.</td></tr>';
-            } finally {
-                loadingServicesEl.classList.add('hidden');
-                loadingPendingServicesEl.style.display = 'none';
-                totalPendingServicesEl.style.display = 'block';
-            }
+                document.querySelectorAll('.pay-service-btn').forEach(b => b.onclick = (e) => openPayServiceModal(e.currentTarget.dataset.id, e.currentTarget.dataset.amount, e.currentTarget.dataset.name));
+                document.querySelectorAll('.revert-service-btn').forEach(b => b.onclick = (e) => revertServiceStatus(e.currentTarget.dataset.id));
+                document.querySelectorAll('.edit-service-btn').forEach(b => b.onclick = (e) => editService(e.currentTarget.dataset.id, data));
+                document.querySelectorAll('.delete-service-btn').forEach(b => b.onclick = (e) => deleteService(e.currentTarget.dataset.id));
+            } catch (error) { console.error('Error al cargar servicios:', error.message); servicesTableBody.innerHTML = '<tr><td colspan="5" class="text-red-400 text-center py-4">Error al cargar servicios.</td></tr>'; }
+            finally { loadingServicesEl.classList.add('hidden'); loadingPendingServicesEl.style.display = 'none'; totalPendingServicesEl.style.display = 'block'; }
         }
-
-        // Abre el modal para añadir/editar servicio
-        function openAddServiceModal(service = null) {
-            addServiceForm.reset();
-            editingServiceId = null;
-            addServiceModalTitle.textContent = 'Registrar Nuevo Servicio';
-
-            if (service) {
-                addServiceModalTitle.textContent = 'Editar Servicio';
-                editingServiceId = service.id;
-                serviceNameEl.value = service.nombre_servicio;
-                serviceAmountEl.value = service.monto;
-                serviceDueDateEl.value = service.fecha_vencimiento; // Asume formato 'YYYY-MM-DD'
-            } else {
-                serviceDueDateEl.valueAsDate = new Date(); // Fecha actual por defecto para nuevo servicio
-            }
-            addServiceModal.classList.remove('hidden');
-        }
-
-        // Cierra el modal de añadir/editar servicio
-        function closeAddServiceModal() {
-            addServiceModal.classList.add('hidden');
-        }
-
-        // Maneja el envío del formulario de añadir/editar servicio
+        function openAddServiceModal(service = null) { addServiceForm.reset(); editingServiceId = null; addServiceModalTitle.textContent = 'Registrar Nuevo Servicio'; if (service) { addServiceModalTitle.textContent = 'Editar Servicio'; editingServiceId = service.id; serviceNameEl.value = service.nombre_servicio; serviceAmountEl.value = service.monto; serviceDueDateEl.value = service.fecha_vencimiento; } else { serviceDueDateEl.valueAsDate = new Date(); } addServiceModal.classList.remove('hidden'); }
+        function closeAddServiceModal() { addServiceModal.classList.add('hidden'); }
         async function handleAddServiceSubmit(event) {
-            event.preventDefault();
-
-            const name = serviceNameEl.value;
-            const amount = parseFloat(serviceAmountEl.value);
-            const dueDate = serviceDueDateEl.value;
-
-            if (!name || isNaN(amount) || amount <= 0 || !dueDate) {
-                showNotification('Por favor, completa todos los campos del servicio y asegúrate que el monto sea válido.', true);
-                return;
-            }
-
+            event.preventDefault(); const name = serviceNameEl.value; const amount = parseFloat(serviceAmountEl.value); const dueDate = serviceDueDateEl.value;
+            if (!name || isNaN(amount) || amount <= 0 || !dueDate) { showNotification('Por favor, completa todos los campos.', true); return; }
             try {
                 let response;
-                if (editingServiceId) {
-                    // Actualizar servicio existente
-                    response = await supabaseClient
-                        .from('servicios')
-                        .update({
-                            nombre_servicio: name,
-                            monto: amount,
-                            fecha_vencimiento: dueDate
-                        })
-                        .eq('id', editingServiceId)
-                        .select();
-                } else {
-                    // Añadir nuevo servicio
-                    response = await supabaseClient
-                        .from('servicios')
-                        .insert([{
-                            nombre_servicio: name,
-                            monto: amount,
-                            fecha_vencimiento: dueDate,
-                            estado: 'pendiente' // Nuevo servicio siempre inicia como pendiente
-                        }])
-                        .select();
-                }
-
-                const { error } = response;
-                if (error) throw error;
-
-                showNotification(editingServiceId ? 'Servicio actualizado con éxito.' : 'Servicio registrado con éxito.');
-                closeAddServiceModal();
-                loadServices(); // Recargar la lista de servicios
-            }
-            catch (error) {
-                console.error('Error al guardar el servicio:', error.message);
-                showNotification('Error al guardar el servicio.', true);
-            }
+                if (editingServiceId) { response = await supabaseClient.from('servicios').update({ nombre_servicio: name, monto: amount, fecha_vencimiento: dueDate }).eq('id', editingServiceId).select(); }
+                else { response = await supabaseClient.from('servicios').insert([{ nombre_servicio: name, monto: amount, fecha_vencimiento: dueDate, estado: 'pendiente' }]).select(); }
+                if (response.error) throw response.error;
+                showNotification(editingServiceId ? 'Servicio actualizado.' : 'Servicio registrado.'); closeAddServiceModal(); loadServices();
+            } catch (error) { console.error('Error al guardar servicio:', error.message); showNotification('Error al guardar servicio.', true); }
         }
-
-        // Edita un servicio existente
-        async function editService(id, allServices) {
-            const serviceToEdit = allServices.find(s => s.id == id);
-            if (serviceToEdit) {
-                openAddServiceModal(serviceToEdit);
-            } else {
-                showNotification('Servicio no encontrado.', true);
-            }
-        }
-
-        // Elimina un servicio
-        async function deleteService(id) {
-            const confirmDelete = await new Promise(resolve => {
-                const modal = document.createElement('div');
-                modal.className = 'fixed inset-0 bg-gray-950 bg-opacity-75 flex items-center justify-center p-4 z-[102]';
-                modal.innerHTML = `
-                    <div class="bg-gray-800 p-6 rounded-xl shadow-2xl w-full max-w-sm relative animate-fade-in-up text-center text-gray-100">
-                        <h3 class="text-xl font-bold text-gray-100 mb-4">¿Estás seguro?</h3>
-                        <p class="text-gray-300 mb-6">Esta acción eliminará el servicio.</p>
-                        <div class="flex justify-center space-x-4">
-                            <button id="confirm-yes" class="bg-red-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-red-700 transition-colors shadow-md">Sí, Eliminar</button>
-                            <button id="confirm-no" class="bg-gray-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-gray-700 transition-colors shadow-md">Cancelar</button>
-                        </div>
-                    </div>
-                `;
-                document.body.appendChild(modal);
-
-                document.getElementById('confirm-yes').addEventListener('click', () => {
-                    modal.remove();
-                    resolve(true);
-                });
-                document.getElementById('confirm-no').addEventListener('click', () => {
-                    modal.remove();
-                    resolve(false);
-                });
-            });
-
-            if (!confirmDelete) {
-                return;
-            }
-
-            try {
-                const { error } = await supabaseClient
-                    .from('servicios')
-                    .delete()
-                    .eq('id', id);
-
-                if (error) throw error;
-
-                showNotification('Servicio eliminado con éxito.');
-                loadServices(); // Recargar la lista de servicios
-            } catch (error) {
-                console.error('Error al eliminar el servicio:', error.message);
-                showNotification('Error al eliminar el servicio.', true);
-            }
-        }
-
-        // Abre el modal para pagar servicio
-        function openPayServiceModal(serviceId, amount, name) {
-            payServiceIdEl.value = serviceId;
-            payServiceAmountEl.value = amount;
-            payServiceNameEl.value = name;
-            payServiceModal.classList.remove('hidden');
-        }
-
-        // Cierra el modal de pagar servicio
-        function closePayServiceModal() {
-            payServiceModal.classList.add('hidden');
-        }
-
-        // Maneja el pago de un servicio
+        async function editService(id, allServices) { const serviceToEdit = allServices.find(s => s.id == id); if (serviceToEdit) openAddServiceModal(serviceToEdit); else showNotification('Servicio no encontrado.', true); }
+        async function deleteService(id) { if (!confirm('¿Estás seguro de eliminar este servicio?')) return; try { const { error } = await supabaseClient.from('servicios').delete().eq('id', id); if (error) throw error; showNotification('Servicio eliminado.'); loadServices(); } catch (error) { console.error('Error al eliminar servicio:', error.message); showNotification('Error al eliminar servicio.', true); } }
+        function openPayServiceModal(id, amount, name) { payServiceIdEl.value = id; payServiceAmountEl.value = amount; payServiceNameEl.value = name; payServiceModal.classList.remove('hidden'); }
+        function closePayServiceModal() { payServiceModal.classList.add('hidden'); }
         async function handlePayServiceSubmit(event) {
-            event.preventDefault();
-
-            const serviceId = payServiceIdEl.value;
-            const amount = parseFloat(payServiceAmountEl.value);
-            const serviceName = payServiceNameEl.value;
-            const payAccount = payAccountEl.value;
-
-            if (!currentUserInitial) {
-                showNotification('Error: No hay usuario logueado. Por favor, inicia sesión.', true);
-                return;
-            }
-
+            event.preventDefault(); const serviceId = payServiceIdEl.value; const amount = parseFloat(payServiceAmountEl.value); const serviceName = payServiceNameEl.value; const payAccount = payAccountEl.value;
+            if (!currentUserInitial) { showNotification('Error: No hay usuario logueado.', true); return; }
             try {
-                // 1. Actualizar el estado del servicio a 'pagado'
-                const { error: serviceError } = await supabaseClient
-                    .from('servicios')
-                    .update({
-                        estado: 'pagado',
-                        fecha_pago: new Date().toISOString(),
-                        cuenta_pago: payAccount
-                    })
-                    .eq('id', serviceId);
-
-                if (serviceError) throw serviceError;
-
-                // 2. Registrar el pago como un gasto en la tabla 'gastos'
-                const { error: expenseError } = await supabaseClient
-                    .from('gastos')
-                    .insert([{
-                        tipo: 'gasto',
-                        cuenta: payAccount,
-                        categoria: 'Pago Servicio',
-                        monto: amount,
-                        descripcion: `Pago de servicio: ${serviceName}`,
-                        tipo_gasto: 'fijo', // Los pagos de servicios suelen ser gastos fijos
-                        user_initial: currentUserInitial // Añadir la inicial del usuario
-                    }]);
-
-                if (expenseError) throw expenseError;
-
-                showNotification('Servicio pagado y gasto registrado con éxito.');
-                closePayServiceModal();
-                loadServices(); // Recargar la lista de servicios
-                updateDashboardData(); // Actualizar dashboard
-                loadAccountBalances(); // Actualizar saldos de cuentas
-                if (!transactionsSection.classList.contains('hidden')) {
-                    loadMonthlyTransactions(); // Actualizar historial de transacciones
-                }
-
-            } catch (error) {
-                console.error('Error al procesar el pago del servicio:', error.message);
-                showNotification('Error al pagar el servicio.', true);
-            }
+                const { error: serviceError } = await supabaseClient.from('servicios').update({ estado: 'pagado', fecha_pago: new Date().toISOString(), cuenta_pago: payAccount }).eq('id', serviceId); if (serviceError) throw serviceError;
+                const { error: expenseError } = await supabaseClient.from('gastos').insert([{ tipo: 'gasto', cuenta: payAccount, categoria: 'Pago Servicio', monto: amount, descripcion: `Pago de servicio: ${serviceName}`, tipo_gasto: 'fijo', user_initial: currentUserInitial }]); if (expenseError) throw expenseError;
+                showNotification('Servicio pagado y gasto registrado.'); closePayServiceModal(); loadServices(); updateDashboardData(); loadAccountBalances(); if (!transactionsSection.classList.contains('hidden')) loadTransactionsHistory();
+            } catch (error) { console.error('Error al pagar servicio:', error.message); showNotification('Error al pagar servicio.', true); }
         }
-
-        // Revertir el estado de un servicio (de pagado a pendiente)
-        async function revertServiceStatus(serviceId) {
-            const confirmRevert = await new Promise(resolve => {
-                const modal = document.createElement('div');
-                modal.className = 'fixed inset-0 bg-gray-950 bg-opacity-75 flex items-center justify-center p-4 z-[102]';
-                modal.innerHTML = `
-                    <div class="bg-gray-800 p-6 rounded-xl shadow-2xl w-full max-w-sm relative animate-fade-in-up text-center text-gray-100">
-                        <h3 class="text-xl font-bold text-gray-100 mb-4">¿Revertir pago?</h3>
-                        <p class="text-gray-300 mb-6">El servicio volverá a "Pendiente". Deberás manejar manualmente el gasto asociado en el historial de transacciones si es necesario.</p>
-                        <div class="flex justify-center space-x-4">
-                            <button id="confirm-yes" class="bg-orange-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-orange-700 transition-colors shadow-md">Sí, Revertir</button>
-                            <button id="confirm-no" class="bg-gray-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-gray-700 transition-colors shadow-md">Cancelar</button>
-                        </div>
-                    </div>
-                `;
-                document.body.appendChild(modal);
-
-                document.getElementById('confirm-yes').addEventListener('click', () => {
-                    modal.remove();
-                    resolve(true);
-                });
-                document.getElementById('confirm-no').addEventListener('click', () => {
-                    modal.remove();
-                    resolve(false);
-                });
-            });
-
-            if (!confirmRevert) {
-                return;
-            }
-
-            try {
-                const { error } = await supabaseClient
-                    .from('servicios')
-                    .update({
-                        estado: 'pendiente',
-                        fecha_pago: null,
-                        cuenta_pago: null
-                    })
-                    .eq('id', serviceId);
-
-                if (error) throw error;
-
-                showNotification('Servicio revertido a pendiente. Recuerda ajustar el gasto en Transacciones si es necesario.');
-                loadServices(); // Recargar la lista de servicios
-                updateDashboardData(); // Actualizar dashboard
-                loadAccountBalances(); // Actualizar saldos de cuentas
-                if (!transactionsSection.classList.contains('hidden')) {
-                    loadMonthlyTransactions(); // Actualizar historial de transacciones
-                }
-                // Recargar datos de objetivos si estamos en esa sección
-                if (!goalsSection.classList.contains('hidden')) {
-                    loadGoalsData();
-                }
-            } catch (error) {
-                console.error('Error al revertir el servicio:', error.message);
-                showNotification('Error al revertir el servicio.', true);
-            }
-        }
-
-        // --- FUNCIONES DE OBJETIVOS ---
-
-        // Carga y muestra los datos de objetivos y la configuración
+        async function revertServiceStatus(id) { if (!confirm('¿Revertir pago? El servicio volverá a "Pendiente".')) return; try { const { error } = await supabaseClient.from('servicios').update({ estado: 'pendiente', fecha_pago: null, cuenta_pago: null }).eq('id', id); if (error) throw error; showNotification('Servicio revertido a pendiente.'); loadServices(); updateDashboardData(); loadAccountBalances(); if (!transactionsSection.classList.contains('hidden')) loadTransactionsHistory(); if (!goalsSection.classList.contains('hidden')) loadGoalsData(); } catch (error) { console.error('Error al revertir servicio:', error.message); showNotification('Error al revertir servicio.', true); } }
         async function loadGoalsData() {
-            const currentMonthYear = getCurrentMonthYear();
-            let currentGoalsConfig = null;
-
-            // Cargar configuración de objetivos
+            const currentMonthYear = getCurrentMonthYear(); let currentGoalsConfig = null;
+            try { const { data, error } = await supabaseClient.from('objetivos_config').select('*').eq('mes_anio', currentMonthYear).single(); if (error && error.code !== 'PGRST116') throw error; currentGoalsConfig = data; } catch (error) { console.error('Error al cargar config de objetivos:', error.message); }
+            let totalFixedExpenses = 0, totalVariableExpenses = 0, totalIncomeMonth = 0, totalExpensesMonth = 0, transactionsToMap = [];
+            const firstDayOfMonthISO = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString();
+            const firstDayOfNextMonthISO = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 1).toISOString();
             try {
-                const { data, error } = await supabaseClient
-                    .from('objetivos_config')
-                    .select('*')
-                    .eq('mes_anio', currentMonthYear)
-                    .single();
-
-                if (error && error.code !== 'PGRST116') { // PGRST116 means no rows found
-                    throw error;
-                }
-                currentGoalsConfig = data;
-            } catch (error) {
-                console.error('Error al cargar configuración de objetivos:', error.message);
-                showNotification('Error al cargar la configuración de objetivos.', true);
-            }
-
-            // Cargar transacciones del mes actual para calcular gastos reales
-            let totalFixedExpenses = 0;
-            let totalVariableExpenses = 0;
-            let totalIncomeMonth = 0;
-            let totalExpensesMonth = 0;
-            let transactionsToMap = [];
-
-            const firstDayOfMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
-            const firstDayOfNextMonth = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 1);
-            const firstDayOfMonthISO = firstDayOfMonth.toISOString();
-            const firstDayOfNextMonthISO = firstDayOfNextMonth.toISOString();
-
-            try {
-                // Excluir gastos que ya están en gastos_con_factura
-                const { data, error } = await supabaseClient
-                    .from('gastos')
-                    .select('monto, tipo, tipo_gasto, categoria, created_at, id')
-                    .gte('created_at', firstDayOfMonthISO)
-                    .lt('created_at', firstDayOfNextMonthISO)
-                    .not('tipo', 'eq', 'traspaso'); // Excluir traspasos
-
-                if (error) throw error;
-
-                const { data: invoicedExpenses, error: invoicedError } = await supabaseClient
-                    .from('gastos_con_factura')
-                    .select('original_transaction_id');
-
-                if (invoicedError) throw invoicedError;
+                const { data, error } = await supabaseClient.from('gastos').select('monto, tipo, tipo_gasto, categoria, created_at, id').gte('created_at', firstDayOfMonthISO).lt('created_at', firstDayOfNextMonthISO).not('tipo', 'eq', 'traspaso'); if (error) throw error;
+                const { data: invoicedExpenses, error: invoicedError } = await supabaseClient.from('gastos_con_factura').select('original_transaction_id'); if (invoicedError) throw invoicedError;
                 const invoicedIds = new Set(invoicedExpenses.map(item => item.original_transaction_id));
-
-
-                data.forEach(item => {
-                    if (item.tipo === 'gasto' && !invoicedIds.has(item.id)) { // Solo considerar gastos no facturados
-                        totalExpensesMonth += item.monto;
-                        if (item.tipo_gasto === 'fijo') {
-                            totalFixedExpenses += item.monto;
-                        } else if (item.tipo_gasto === 'variable') {
-                            totalVariableExpenses += item.monto;
-                        } else {
-                            // Si no está clasificado, añadir a la lista para mapear
-                            transactionsToMap.push(item);
-                        }
-                    } else if (item.tipo === 'ingreso') {
-                        totalIncomeMonth += item.monto;
-                    }
-                });
-            } catch (error) {
-                console.error('Error al cargar transacciones para objetivos:', error.message);
-                showNotification('Error al cargar transacciones para objetivos.', true);
-            }
-
-            // Actualizar Tarjetas de Objetivos
-            const plannedIncome = currentGoalsConfig ? currentGoalsConfig.ingreso_previsto : 0;
-            const fixedPercent = currentGoalsConfig ? currentGoalsConfig.porcentaje_fijo : 0;
-            const variablePercent = currentGoalsConfig ? currentGoalsConfig.porcentaje_variable : 0;
-            const savingPercent = currentGoalsConfig ? currentGoalsConfig.porcentaje_ahorro : 0;
-
-            const goalFixed = plannedIncome * (fixedPercent / 100);
-            const goalVariable = plannedIncome * (variablePercent / 100);
-            const goalSaving = plannedIncome * (savingPercent / 100);
-
-            const diffFixed = goalFixed - totalFixedExpenses;
-            const diffVariable = goalVariable - totalVariableExpenses;
-            const realSaving = totalIncomeMonth - totalExpensesMonth; // Ahorro real = Ingresos del mes - Gastos del mes
-            const diffSaving = goalSaving - realSaving;
-
-            fixedExpensesGoalEl.textContent = formatAmount(goalFixed);
-            fixedExpensesRealEl.textContent = formatAmount(totalFixedExpenses);
-            fixedExpensesDiffEl.textContent = formatAmount(diffFixed);
-            fixedExpensesDiffEl.classList.toggle('text-red-400', diffFixed < 0);
-            fixedExpensesDiffEl.classList.toggle('text-green-400', diffFixed >= 0);
-
-            variableExpensesGoalEl.textContent = formatAmount(goalVariable);
-            variableExpensesRealEl.textContent = formatAmount(totalVariableExpenses);
-            variableExpensesDiffEl.textContent = formatAmount(diffVariable);
-            variableExpensesDiffEl.classList.toggle('text-red-400', diffVariable < 0);
-            variableExpensesDiffEl.classList.toggle('text-green-400', diffVariable >= 0);
-
-            savingGoalEl.textContent = formatAmount(goalSaving);
-            savingRealEl.textContent = formatAmount(realSaving);
-            savingDiffEl.textContent = formatAmount(diffSaving);
-            savingDiffEl.classList.toggle('text-red-400', diffSaving > 0); // Si la diferencia es positiva, significa que falta para la meta
-            savingDiffEl.classList.toggle('text-green-400', diffSaving <= 0); // Si la diferencia es negativa o cero, se ha cumplido o superado
-
-            if (currentGoalsConfig && realSaving >= goalSaving && goalSaving > 0) {
-                savingMetEl.textContent = 'Sí';
-                savingMetEl.classList.remove('text-red-400');
-                savingMetEl.classList.add('text-green-400');
-            } else {
-                savingMetEl.textContent = 'No';
-                savingMetEl.classList.remove('text-green-400');
-                savingMetEl.classList.add('text-red-400');
-            }
-
-            // Rellenar formulario de configuración
-            if (currentGoalsConfig) {
-                monthlyIncomeEl.value = currentGoalsConfig.ingreso_previsto;
-                fixedPercentEl.value = currentGoalsConfig.porcentaje_fijo;
-                variablePercentEl.value = currentGoalsConfig.porcentaje_variable;
-                savingPercentEl.value = currentGoalsConfig.porcentaje_ahorro;
-            } else {
-                // Valores por defecto si no hay configuración
-                monthlyIncomeEl.value = '';
-                fixedPercentEl.value = '';
-                variablePercentEl.value = '';
-                savingPercentEl.value = '';
-            }
-
-            // Cargar tabla de mapeo de gastos
+                data.forEach(item => { if (item.tipo === 'gasto' && !invoicedIds.has(item.id)) { totalExpensesMonth += item.monto; if (item.tipo_gasto === 'fijo') totalFixedExpenses += item.monto; else if (item.tipo_gasto === 'variable') totalVariableExpenses += item.monto; else transactionsToMap.push(item); } else if (item.tipo === 'ingreso') totalIncomeMonth += item.monto; });
+            } catch (error) { console.error('Error al cargar transacciones para objetivos:', error.message); }
+            const plannedIncome = currentGoalsConfig ? currentGoalsConfig.ingreso_previsto : 0; const fixedPercent = currentGoalsConfig ? currentGoalsConfig.porcentaje_fijo : 0; const variablePercent = currentGoalsConfig ? currentGoalsConfig.porcentaje_variable : 0; const savingPercent = currentGoalsConfig ? currentGoalsConfig.porcentaje_ahorro : 0;
+            const goalFixed = plannedIncome * (fixedPercent / 100); const goalVariable = plannedIncome * (variablePercent / 100); const goalSaving = plannedIncome * (savingPercent / 100);
+            const diffFixed = goalFixed - totalFixedExpenses; const diffVariable = goalVariable - totalVariableExpenses; const realSaving = totalIncomeMonth - totalExpensesMonth; const diffSaving = goalSaving - realSaving;
+            fixedExpensesGoalEl.textContent = formatAmount(goalFixed); fixedExpensesRealEl.textContent = formatAmount(totalFixedExpenses); fixedExpensesDiffEl.textContent = formatAmount(diffFixed); fixedExpensesDiffEl.classList.toggle('text-red-400', diffFixed < 0); fixedExpensesDiffEl.classList.toggle('text-green-400', diffFixed >= 0);
+            variableExpensesGoalEl.textContent = formatAmount(goalVariable); variableExpensesRealEl.textContent = formatAmount(totalVariableExpenses); variableExpensesDiffEl.textContent = formatAmount(diffVariable); variableExpensesDiffEl.classList.toggle('text-red-400', diffVariable < 0); variableExpensesDiffEl.classList.toggle('text-green-400', diffVariable >= 0);
+            savingGoalEl.textContent = formatAmount(goalSaving); savingRealEl.textContent = formatAmount(realSaving); savingDiffEl.textContent = formatAmount(diffSaving); savingDiffEl.classList.toggle('text-red-400', diffSaving > 0); savingDiffEl.classList.toggle('text-green-400', diffSaving <= 0);
+            if (currentGoalsConfig && realSaving >= goalSaving && goalSaving > 0) { savingMetEl.textContent = 'Sí'; savingMetEl.className = 'text-green-400'; } else { savingMetEl.textContent = 'No'; savingMetEl.className = 'text-red-400'; }
+            if (currentGoalsConfig) { monthlyIncomeEl.value = currentGoalsConfig.ingreso_previsto; fixedPercentEl.value = currentGoalsConfig.porcentaje_fijo; variablePercentEl.value = currentGoalsConfig.porcentaje_variable; savingPercentEl.value = currentGoalsConfig.porcentaje_ahorro; } else { goalsConfigForm.reset(); }
             renderExpenseMappingTable(transactionsToMap);
         }
-
-        // Actualiza el resumen de objetivos en el Dashboard
         async function updateDashboardGoalsSummary(totalIncomeMonth, totalExpensesMonth) {
-            const currentMonthYear = getCurrentMonthYear();
-            let currentGoalsConfig = null;
-
-            try {
-                const { data, error } = await supabaseClient
-                    .from('objetivos_config')
-                    .select('*')
-                    .eq('mes_anio', currentMonthYear)
-                    .single();
-
-                if (error && error.code !== 'PGRST116') {
-                    throw error;
-                }
-                currentGoalsConfig = data;
-            } catch (error) {
-                console.error('Error al cargar configuración de objetivos para dashboard:', error.message);
-                // Continuar con valores predeterminados si hay un error
-            }
-
-            const plannedIncome = currentGoalsConfig ? currentGoalsConfig.ingreso_previsto : 0;
-            const savingPercent = currentGoalsConfig ? currentGoalsConfig.porcentaje_ahorro : 0;
-            const goalSaving = plannedIncome * (savingPercent / 100);
-            const realSaving = totalIncomeMonth - totalExpensesMonth;
-
+            const currentMonthYear = getCurrentMonthYear(); let currentGoalsConfig = null;
+            try { const { data, error } = await supabaseClient.from('objetivos_config').select('*').eq('mes_anio', currentMonthYear).single(); if (error && error.code !== 'PGRST116') throw error; currentGoalsConfig = data; } catch (error) { console.error('Error al cargar config de objetivos para dashboard:', error.message); }
+            const plannedIncome = currentGoalsConfig ? currentGoalsConfig.ingreso_previsto : 0; const savingPercent = currentGoalsConfig ? currentGoalsConfig.porcentaje_ahorro : 0; const goalSaving = plannedIncome * (savingPercent / 100); const realSaving = totalIncomeMonth - totalExpensesMonth;
             dashboardSavingAchievedEl.textContent = formatAmount(realSaving);
-
-            let percentageCompletion = 0;
-            if (goalSaving > 0) {
-                percentageCompletion = (realSaving / goalSaving) * 100;
-            } else if (realSaving > 0 && goalSaving === 0) {
-                percentageCompletion = 100; // Si hay ahorro sin meta, se considera 100%
-            }
-
+            let percentageCompletion = (goalSaving > 0) ? (realSaving / goalSaving) * 100 : (realSaving > 0 ? 100 : 0);
             dashboardSavingPercentageEl.textContent = `${percentageCompletion.toFixed(2)}%`;
-
-            let statusText = 'No Definido';
-            let statusColorClass = 'text-yellow-400';
-
-            if (currentGoalsConfig) {
-                if (currentGoalsConfig.fecha_cierre_mes) {
-                    statusText = 'Mes Cerrado';
-                    statusColorClass = 'text-gray-400';
-                } else if (goalSaving > 0) {
-                    if (realSaving >= goalSaving) {
-                        statusText = 'Objetivo Cumplido';
-                        statusColorClass = 'text-green-400';
-                    } else {
-                        statusText = 'En Progreso';
-                        statusColorClass = 'text-orange-400';
-                    }
-                } else {
-                    statusText = 'Sin Meta de Ahorro';
-                    statusColorClass = 'text-gray-400';
-                }
-            }
-
-            dashboardSavingStatusEl.textContent = statusText;
-            dashboardSavingStatusEl.className = `text-2xl font-bold mt-2 ${statusColorClass}`;
+            let statusText = 'No Definido', statusColorClass = 'text-yellow-400';
+            if (currentGoalsConfig) { if (currentGoalsConfig.fecha_cierre_mes) { statusText = 'Mes Cerrado'; statusColorClass = 'text-gray-400'; } else if (goalSaving > 0) { if (realSaving >= goalSaving) { statusText = 'Objetivo Cumplido'; statusColorClass = 'text-green-400'; } else { statusText = 'En Progreso'; statusColorClass = 'text-orange-400'; } } else { statusText = 'Sin Meta de Ahorro'; statusColorClass = 'text-gray-400'; } }
+            dashboardSavingStatusEl.textContent = statusText; dashboardSavingStatusEl.className = `text-2xl font-bold mt-2 ${statusColorClass}`;
         }
-
-
-        // Maneja el envío del formulario de configuración de objetivos
         async function handleGoalsConfigSubmit(event) {
-            event.preventDefault();
-
-            const monthlyIncome = parseFloat(monthlyIncomeEl.value);
-            const fixedPercent = parseFloat(fixedPercentEl.value);
-            const variablePercent = parseFloat(variablePercentEl.value);
-            const savingPercent = parseFloat(savingPercentEl.value);
-
-            if (isNaN(monthlyIncome) || monthlyIncome <= 0 || isNaN(fixedPercent) || isNaN(variablePercent) || isNaN(savingPercent)) {
-                showNotification('Por favor, ingresa valores válidos para todos los campos.', true);
-                return;
-            }
-
-            const totalPercentage = fixedPercent + variablePercent + savingPercent;
-            if (totalPercentage !== 100) {
-                percentageSumWarningEl.classList.remove('hidden');
-                showNotification('La suma de porcentajes debe ser 100%.', true);
-                return;
-            } else {
-                percentageSumWarningEl.classList.add('hidden');
-            }
-
+            event.preventDefault(); const monthlyIncome = parseFloat(monthlyIncomeEl.value); const fixedPercent = parseFloat(fixedPercentEl.value); const variablePercent = parseFloat(variablePercentEl.value); const savingPercent = parseFloat(savingPercentEl.value);
+            if (isNaN(monthlyIncome) || monthlyIncome <= 0 || isNaN(fixedPercent) || isNaN(variablePercent) || isNaN(savingPercent)) { showNotification('Por favor, ingresa valores válidos.', true); return; }
+            if (fixedPercent + variablePercent + savingPercent !== 100) { percentageSumWarningEl.classList.remove('hidden'); showNotification('La suma de porcentajes debe ser 100%.', true); return; } else { percentageSumWarningEl.classList.add('hidden'); }
             const currentMonthYear = getCurrentMonthYear();
-
             try {
-                // Intentar actualizar primero (si ya existe una configuración para el mes)
-                const { data: existingConfig, error: fetchError } = await supabaseClient
-                    .from('objetivos_config')
-                    .select('id')
-                    .eq('mes_anio', currentMonthYear)
-                    .single();
-
-                if (fetchError && fetchError.code !== 'PGRST116') { // PGRST116 means no rows found
-                    throw fetchError;
-                }
-
+                const { data: existingConfig, error: fetchError } = await supabaseClient.from('objetivos_config').select('id').eq('mes_anio', currentMonthYear).single();
+                if (fetchError && fetchError.code !== 'PGRST116') throw fetchError;
                 let response;
-                if (existingConfig) {
-                    // Actualizar configuración existente
-                    response = await supabaseClient
-                        .from('objetivos_config')
-                        .update({
-                            ingreso_previsto: monthlyIncome,
-                            porcentaje_fijo: fixedPercent,
-                            porcentaje_variable: variablePercent,
-                            porcentaje_ahorro: savingPercent
-                        })
-                        .eq('id', existingConfig.id)
-                        .select();
-                } else {
-                    // Insertar nueva configuración
-                    response = await supabaseClient
-                        .from('objetivos_config')
-                        .insert([{
-                            mes_anio: currentMonthYear,
-                            ingreso_previsto: monthlyIncome,
-                            porcentaje_fijo: fixedPercent,
-                            porcentaje_variable: variablePercent,
-                            porcentaje_ahorro: savingPercent
-                        }])
-                        .select();
-                }
-
-                const { error } = response;
-                if (error) throw error;
-
-                showNotification('Configuración de objetivos guardada con éxito.');
-                loadGoalsData(); // Recargar datos de objetivos
-                updateDashboardData(); // Actualizar dashboard
-            } catch (error) {
-                console.error('Error al guardar la configuración de objetivos:', error.message);
-                showNotification('Error al guardar la configuración de objetivos.', true);
-            }
+                if (existingConfig) { response = await supabaseClient.from('objetivos_config').update({ ingreso_previsto: monthlyIncome, porcentaje_fijo: fixedPercent, porcentaje_variable: variablePercent, porcentaje_ahorro: savingPercent }).eq('id', existingConfig.id).select(); }
+                else { response = await supabaseClient.from('objetivos_config').insert([{ mes_anio: currentMonthYear, ingreso_previsto: monthlyIncome, porcentaje_fijo: fixedPercent, porcentaje_variable: variablePercent, porcentaje_ahorro: savingPercent }]).select(); }
+                if (response.error) throw response.error;
+                showNotification('Configuración de objetivos guardada.'); loadGoalsData(); updateDashboardData();
+            } catch (error) { console.error('Error al guardar config de objetivos:', error.message); showNotification('Error al guardar config de objetivos.', true); }
         }
-
-        // Maneja el cierre de mes y el guardado del ahorro
         async function handleCloseMonthSaveSaving() {
-            const confirmClose = await new Promise(resolve => {
-                const modal = document.createElement('div');
-                modal.className = 'fixed inset-0 bg-gray-950 bg-opacity-75 flex items-center justify-center p-4 z-[102]';
-                modal.innerHTML = `
-                    <div class="bg-gray-800 p-6 rounded-xl shadow-2xl w-full max-w-sm relative animate-fade-in-up text-center text-gray-100">
-                        <h3 class="text-xl font-bold text-gray-100 mb-4">¿Cerrar Mes y Guardar Ahorro?</h3>
-                        <p class="text-gray-300 mb-6">Esta acción registrará el ahorro real como traspaso de BNB a Mercantil y marcará el mes como cerrado para objetivos. ¡No se podrá modificar la configuración de este mes!</p>
-                        <div class="flex justify-center space-x-4">
-                            <button id="confirm-yes" class="bg-green-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-green-700 transition-colors shadow-md">Sí, Cerrar y Guardar</button>
-                            <button id="confirm-no" class="bg-gray-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-gray-700 transition-colors shadow-md">Cancelar</button>
-                        </div>
-                    </div>
-                `;
-                document.body.appendChild(modal);
-
-                document.getElementById('confirm-yes').addEventListener('click', () => {
-                    modal.remove();
-                    resolve(true);
-                });
-                document.getElementById('confirm-no').addEventListener('click', () => {
-                    modal.remove();
-                    resolve(false);
-                });
-            });
-
-            if (!confirmClose) {
-                return;
-            }
-            if (!currentUserInitial) {
-                showNotification('Error: No hay usuario logueado. Por favor, inicia sesión.', true);
-                return;
-            }
-
-            const currentMonthYear = getCurrentMonthYear();
-            let realSavingAmount = 0;
-
+            if (!confirm('¿Cerrar Mes y Guardar Ahorro? Esta acción es irreversible.')) return; if (!currentUserInitial) { showNotification('Error: No hay usuario logueado.', true); return; }
+            const currentMonthYear = getCurrentMonthYear(); let realSavingAmount = 0;
             try {
-                // Calcular ahorro real del mes
-                const firstDayOfMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
-                const firstDayOfNextMonth = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 1);
-                const firstDayOfMonthISO = firstDayOfMonth.toISOString();
-                const firstDayOfNextMonthISO = firstDayOfNextMonth.toISOString();
-
-                // Excluir gastos que ya están en gastos_con_factura
-                const { data: transactions, error: transError } = await supabaseClient
-                    .from('gastos')
-                    .select('monto, tipo, id')
-                    .gte('created_at', firstDayOfMonthISO)
-                    .lt('created_at', firstDayOfNextMonthISO)
-                    .not('tipo', 'eq', 'traspaso');
-
-                if (transError) throw transError;
-
-                const { data: invoicedExpenses, error: invoicedError } = await supabaseClient
-                    .from('gastos_con_factura')
-                    .select('original_transaction_id');
-
-                if (invoicedError) throw invoicedError;
+                const firstDayOfMonthISO = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString(); const firstDayOfNextMonthISO = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 1).toISOString();
+                const { data: transactions, error: transError } = await supabaseClient.from('gastos').select('monto, tipo, id').gte('created_at', firstDayOfMonthISO).lt('created_at', firstDayOfNextMonthISO).not('tipo', 'eq', 'traspaso'); if (transError) throw transError;
+                const { data: invoicedExpenses, error: invoicedError } = await supabaseClient.from('gastos_con_factura').select('original_transaction_id'); if (invoicedError) throw invoicedError;
                 const invoicedIds = new Set(invoicedExpenses.map(item => item.original_transaction_id));
-
-
-                let totalIncome = 0;
-                let totalExpenses = 0;
-                transactions.forEach(t => {
-                    if (t.tipo === 'ingreso') totalIncome += t.monto;
-                    else if (t.tipo === 'gasto' && !invoicedIds.has(t.id)) totalExpenses += t.monto; // Solo considerar gastos no facturados
-                });
-                realSavingAmount = totalIncome - totalExpenses;
-
-                if (realSavingAmount > 0) {
-                    // Registrar traspaso del ahorro real
-                    const { error: transferError } = await supabaseClient
-                        .from('gastos')
-                        .insert([{
-                            created_at: new Date().toISOString(),
-                            tipo: 'traspaso',
-                            cuenta: 'BNB', // Cuenta de origen para el ahorro
-                            target_cuenta: 'Mercantil', // Cuenta de destino para el ahorro
-                            categoria: 'Ahorro Mes',
-                            monto: realSavingAmount,
-                            descripcion: `Ahorro del mes ${currentMonthYear}`,
-                            user_initial: currentUserInitial // Añadir la inicial del usuario
-                        }]);
-                    if (transferError) throw transferError;
-                }
-
-                // Marcar el mes como cerrado en objetivos_config
-                const { data: existingConfig, error: fetchError } = await supabaseClient
-                    .from('objetivos_config')
-                    .select('id')
-                    .eq('mes_anio', currentMonthYear)
-                    .single();
-
-                if (fetchError && fetchError.code !== 'PGRST116') {
-                    throw fetchError;
-                }
-
-                if (existingConfig) {
-                    await supabaseClient
-                        .from('objetivos_config')
-                        .update({ fecha_cierre_mes: new Date().toISOString() })
-                        .eq('id', existingConfig.id);
-                } else {
-                    // Si no hay configuración para el mes, crear una y cerrarla
-                    await supabaseClient
-                        .from('objetivos_config')
-                        .insert([{
-                            mes_anio: currentMonthYear,
-                            ingreso_previsto: 0, // O un valor predeterminado si no se configuró
-                            porcentaje_fijo: 0,
-                            porcentaje_variable: 0,
-                            porcentaje_ahorro: 0,
-                            fecha_cierre_mes: new Date().toISOString()
-                        }]);
-                }
-
-                showNotification('Mes cerrado y ahorro guardado con éxito.');
-                loadGoalsData(); // Recargar datos de objetivos
-                updateDashboardData(); // Actualizar dashboard
-                loadAccountBalances(); // Actualizar saldos de cuentas
-                if (!transactionsSection.classList.contains('hidden')) {
-                    loadMonthlyTransactions(); // Actualizar historial de transacciones
-                }
-
-            } catch (error) {
-                console.error('Error al cerrar el mes y guardar ahorro:', error.message);
-                showNotification('Error al cerrar el mes y guardar ahorro.', true);
-            }
+                let totalIncome = 0, totalExpenses = 0; transactions.forEach(t => { if (t.tipo === 'ingreso') totalIncome += t.monto; else if (t.tipo === 'gasto' && !invoicedIds.has(t.id)) totalExpenses += t.monto; }); realSavingAmount = totalIncome - totalExpenses;
+                if (realSavingAmount > 0) { const { error: transferError } = await supabaseClient.from('gastos').insert([{ created_at: new Date().toISOString(), tipo: 'traspaso', cuenta: 'BNB', target_cuenta: 'Mercantil', categoria: 'Ahorro Mes', monto: realSavingAmount, descripcion: `Ahorro del mes ${currentMonthYear}`, user_initial: currentUserInitial }]); if (transferError) throw transferError; }
+                const { data: existingConfig, error: fetchError } = await supabaseClient.from('objetivos_config').select('id').eq('mes_anio', currentMonthYear).single();
+                if (fetchError && fetchError.code !== 'PGRST116') throw fetchError;
+                if (existingConfig) { await supabaseClient.from('objetivos_config').update({ fecha_cierre_mes: new Date().toISOString() }).eq('id', existingConfig.id); }
+                else { await supabaseClient.from('objetivos_config').insert([{ mes_anio: currentMonthYear, ingreso_previsto: 0, porcentaje_fijo: 0, porcentaje_variable: 0, porcentaje_ahorro: 0, fecha_cierre_mes: new Date().toISOString() }]); }
+                showNotification('Mes cerrado y ahorro guardado.'); loadGoalsData(); updateDashboardData(); loadAccountBalances(); if (!transactionsSection.classList.contains('hidden')) loadTransactionsHistory();
+            } catch (error) { console.error('Error al cerrar mes:', error.message); showNotification('Error al cerrar mes.', true); }
         }
-
-        // Renderiza la tabla de mapeo de gastos
-        async function renderExpenseMappingTable(transactions) {
-            expenseMappingTableBody.innerHTML = '';
-            loadingExpenseMappingEl.classList.add('hidden');
-            noExpensesToMapMessage.classList.add('hidden');
-
+        function renderExpenseMappingTable(transactions) {
+            expenseMappingTableBody.innerHTML = ''; loadingExpenseMappingEl.classList.add('hidden'); noExpensesToMapMessage.classList.add('hidden');
             const expensesToClassify = transactions.filter(t => t.tipo === 'gasto' && (t.tipo_gasto === null || t.tipo_gasto === 'no_clasificado'));
-
-            if (expensesToClassify.length === 0) {
-                noExpensesToMapMessage.classList.remove('hidden');
-                return;
-            }
-
+            if (expensesToClassify.length === 0) { noExpensesToMapMessage.classList.remove('hidden'); return; }
             expensesToClassify.forEach(expense => {
-                const row = document.createElement('tr');
-                row.classList.add('border-b', 'border-gray-600', 'hover:bg-gray-600');
-                row.innerHTML = `
-                    <td class="py-3 px-4">${formatDate(expense.created_at)}</td>
-                    <td class="py-3 px-4">${expense.categoria || 'N/A'}</td>
-                    <td class="py-3 px-4 text-right">${formatAmount(expense.monto)}</td>
-                    <td class="py-3 px-4 text-center">
-                        <div class="inline-flex rounded-md shadow-sm radio-group-mapping" role="group">
-                            <input type="radio" id="fixed-${expense.id}" name="expense-type-${expense.id}" value="fijo" class="hidden" ${expense.tipo_gasto === 'fijo' ? 'checked' : ''}>
-                            <label for="fixed-${expense.id}" class="px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-l-lg hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-blue-500 dark:focus:text-white">
-                                Fijo
-                            </label>
-                            <input type="radio" id="variable-${expense.id}" name="expense-type-${expense.id}" value="variable" class="hidden" ${expense.tipo_gasto === 'variable' ? 'checked' : ''}>
-                            <label for="variable-${expense.id}" class="px-4 py-2 text-sm font-medium text-gray-900 bg-white border-t border-b border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-blue-500 dark:focus:text-white">
-                                Variable
-                            </label>
-                            <input type="radio" id="unclassified-${expense.id}" name="expense-type-${expense.id}" value="no_clasificado" class="hidden" ${expense.tipo_gasto === 'no_clasificado' || expense.tipo_gasto === null ? 'checked' : ''}>
-                            <label for="unclassified-${expense.id}" class="px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-r-lg hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-blue-500 dark:focus:text-white">
-                                Sin Clasificar
-                            </label>
-                        </div>
-                    </td>
-                `;
+                const row = document.createElement('tr'); row.classList.add('border-b', 'border-gray-600', 'hover:bg-gray-600');
+                row.innerHTML = `<td class="py-3 px-4">${new Date(expense.created_at).toLocaleDateString('es-ES')}</td><td class="py-3 px-4">${expense.categoria || 'N/A'}</td><td class="py-3 px-4 text-right">${formatAmount(expense.monto)}</td><td class="py-3 px-4 text-center"><div class="inline-flex rounded-md shadow-sm radio-group-mapping" role="group"><input type="radio" id="fixed-${expense.id}" name="expense-type-${expense.id}" value="fijo" class="hidden" ${expense.tipo_gasto === 'fijo' ? 'checked' : ''}><label for="fixed-${expense.id}" class="px-4 py-2 text-sm font-medium rounded-l-lg">Fijo</label><input type="radio" id="variable-${expense.id}" name="expense-type-${expense.id}" value="variable" class="hidden" ${expense.tipo_gasto === 'variable' ? 'checked' : ''}><label for="variable-${expense.id}" class="px-4 py-2 text-sm font-medium">Variable</label><input type="radio" id="unclassified-${expense.id}" name="expense-type-${expense.id}" value="no_clasificado" class="hidden" ${expense.tipo_gasto === 'no_clasificado' || expense.tipo_gasto === null ? 'checked' : ''}><label for="unclassified-${expense.id}" class="px-4 py-2 text-sm font-medium rounded-r-lg">Sin Clasificar</label></div></td>`;
                 expenseMappingTableBody.appendChild(row);
-
-                // Add event listeners for the radio buttons
-                row.querySelectorAll(`input[name="expense-type-${expense.id}"]`).forEach(radio => {
-                    radio.addEventListener('change', (event) => {
-                        updateExpenseType(expense.id, event.target.value);
-                    });
-                });
+                row.querySelectorAll(`input[name="expense-type-${expense.id}"]`).forEach(radio => radio.onchange = (e) => updateExpenseType(expense.id, e.target.value));
             });
         }
-
-        // Actualiza el tipo de gasto (fijo/variable) en Supabase
         async function updateExpenseType(transactionId, newType) {
-            try {
-                const { error } = await supabaseClient
-                    .from('gastos')
-                    .update({ tipo_gasto: newType })
-                    .eq('id', transactionId);
-
-                if (error) throw error;
-
-                showNotification('Tipo de gasto actualizado.');
-                loadGoalsData(); // Recargar datos de objetivos para reflejar el cambio
-                updateDashboardData(); // Actualizar dashboard
-            } catch (error) {
-                console.error('Error al actualizar el tipo de gasto:', error.message);
-                showNotification('Error al actualizar el tipo de gasto.', true);
-            }
+            try { const { error } = await supabaseClient.from('gastos').update({ tipo_gasto: newType }).eq('id', transactionId); if (error) throw error; showNotification('Tipo de gasto actualizado.'); loadGoalsData(); updateDashboardData(); }
+            catch (error) { console.error('Error al actualizar tipo de gasto:', error.message); showNotification('Error al actualizar tipo de gasto.', true); }
         }
-
-        // --- FUNCIONES DE IMPUESTOS (Nuevas) ---
-
-        // Marca un gasto como "con factura" y lo traslada a la tabla de impuestos
         async function markAsInvoiced(transaction) {
-            const confirmInvoice = await new Promise(resolve => {
-                const modal = document.createElement('div');
-                modal.className = 'fixed inset-0 bg-gray-950 bg-opacity-75 flex items-center justify-center p-4 z-[102]';
-                modal.innerHTML = `
-                    <div class="bg-gray-800 p-6 rounded-xl shadow-2xl w-full max-w-sm relative animate-fade-in-up text-center text-gray-100">
-                        <h3 class="text-xl font-bold text-gray-100 mb-4">¿Marcar como "Con Factura"?</h3>
-                        <p class="text-gray-300 mb-6">Este gasto se moverá a la sección de Impuestos y se calculará el RE IVA.</p>
-                        <div class="flex justify-center space-x-4">
-                            <button id="confirm-yes" class="bg-purple-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-purple-700 transition-colors shadow-md">Sí, Marcar</button>
-                            <button id="confirm-no" class="bg-gray-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-gray-700 transition-colors shadow-md">Cancelar</button>
-                        </div>
-                    </div>
-                `;
-                document.body.appendChild(modal);
-
-                document.getElementById('confirm-yes').addEventListener('click', () => {
-                    modal.remove();
-                    resolve(true);
-                });
-                document.getElementById('confirm-no').addEventListener('click', () => {
-                    modal.remove();
-                    resolve(false);
-                });
-            });
-
-            if (!confirmInvoice) {
-                return;
-            }
-
+            if (!confirm('¿Marcar como "Con Factura"?')) return;
             try {
-                const reIvaAmount = transaction.monto * 0.05; // Calcular 5% del monto original
-
-                // Insertar en la tabla 'gastos_con_factura'
-                const { error: insertError } = await supabaseClient
-                    .from('gastos_con_factura')
-                    .insert([{
-                        fecha: transaction.created_at,
-                        tipo: transaction.tipo,
-                        cuenta: transaction.cuenta,
-                        categoria: transaction.categoria,
-                        monto: transaction.monto,
-                        total_re_iva: reIvaAmount,
-                        original_transaction_id: transaction.id, // Guardar el ID de la transacción original
-                        user_initial: transaction.user_initial
-                    }]);
-
-                if (insertError) throw insertError;
-
-                showNotification('Gasto marcado con factura y trasladado a Impuestos.');
-                // Recargar las secciones relevantes
-                updateDashboardData();
-                loadMonthlyTransactions();
-                loadTaxesData(); // Cargar datos de impuestos para reflejar el cambio
-                loadGoalsData(); // Actualizar objetivos para que no se consideren estos gastos
-            } catch (error) {
-                console.error('Error al marcar como "Con Factura":', error.message);
-                showNotification('Error al marcar gasto con factura.', true);
-            }
+                const reIvaAmount = transaction.monto * 0.05;
+                const { error: insertError } = await supabaseClient.from('gastos_con_factura').insert([{ fecha: transaction.created_at, tipo: transaction.tipo, cuenta: transaction.cuenta, categoria: transaction.categoria, monto: transaction.monto, total_re_iva: reIvaAmount, original_transaction_id: transaction.id, user_initial: transaction.user_initial }]); if (insertError) throw insertError;
+                showNotification('Gasto marcado con factura.'); updateDashboardData(); loadTransactionsHistory(); loadTaxesData(); loadGoalsData();
+            } catch (error) { console.error('Error al marcar con factura:', error.message); showNotification('Error al marcar con factura.', true); }
         }
-
-        // Carga y muestra los gastos con factura
         async function loadTaxesData() {
-            loadingTaxesEl.classList.remove('hidden');
-            taxesTableBody.innerHTML = ''; // Limpiar tabla
-            noTaxesMessage.classList.add('hidden');
-            totalReIvaReturnEl.textContent = formatAmount(0); // Reset total RE IVA
-            totalOriginalAmountEl.textContent = formatAmount(0);
-            totalReIvaAmountEl.textContent = formatAmount(0);
-
+            loadingTaxesEl.classList.remove('hidden'); taxesTableBody.innerHTML = ''; noTaxesMessage.classList.add('hidden'); totalReIvaReturnEl.textContent = formatAmount(0); totalOriginalAmountEl.textContent = formatAmount(0); totalReIvaAmountEl.textContent = formatAmount(0);
             try {
-                const { data, error } = await supabaseClient
-                    .from('gastos_con_factura')
-                    .select('*')
-                    .order('fecha', { ascending: false }); // Ordenar por fecha descendente
-
-                if (error) throw error;
-
-                if (data.length === 0) {
-                    noTaxesMessage.classList.remove('hidden');
-                    loadingTaxesEl.classList.add('hidden');
-                    return;
-                }
-
+                const { data, error } = await supabaseClient.from('gastos_con_factura').select('*').order('fecha', { ascending: false }); if (error) throw error;
+                if (data.length === 0) { noTaxesMessage.classList.remove('hidden'); loadingTaxesEl.classList.add('hidden'); return; }
                 renderTaxesTable(data);
-
-            } catch (error) {
-                console.error('Error al cargar gastos con factura:', error.message);
-                taxesTableBody.innerHTML = '<tr><td colspan="7" class="text-red-400 text-center py-4">Error al cargar gastos con factura.</td></tr>';
-            } finally {
-                loadingTaxesEl.classList.add('hidden');
-                loadingReIvaEl.style.display = 'none';
-                totalReIvaReturnEl.style.display = 'block';
-            }
+            } catch (error) { console.error('Error al cargar gastos con factura:', error.message); taxesTableBody.innerHTML = '<tr><td colspan="7" class="text-red-400 text-center py-4">Error al cargar datos.</td></tr>'; }
+            finally { loadingTaxesEl.classList.add('hidden'); loadingReIvaEl.style.display = 'none'; totalReIvaReturnEl.style.display = 'block'; }
         }
-
-        // Renderiza la tabla de impuestos y calcula totales
         function renderTaxesTable(transactions) {
-            taxesTableBody.innerHTML = '';
-            let totalOriginalAmount = 0;
-            let totalReIva = 0;
-
+            taxesTableBody.innerHTML = ''; let totalOriginalAmount = 0, totalReIva = 0;
             transactions.forEach(transaction => {
-                // Asegurarse de que transaction.id exista antes de proceder
-                if (!transaction.id) {
-                    console.warn('Saltando transacción en la tabla de impuestos debido a la falta de ID:', transaction);
-                    return; // Saltar esta transacción
-                }
-
-                const row = document.createElement('tr');
-                row.classList.add('border-b', 'border-gray-600', 'hover:bg-gray-600');
-
-                totalOriginalAmount += transaction.monto;
-                totalReIva += transaction.total_re_iva;
-
-                row.innerHTML = `
-                    <td class="py-3 px-4">${formatDate(transaction.fecha)}</td>
-                    <td class="py-3 px-4">${transaction.tipo}</td>
-                    <td class="py-3 px-4">${transaction.cuenta}</td>
-                    <td class="py-3 px-4">${transaction.categoria}</td>
-                    <td class="py-3 px-4 text-right">${formatAmount(transaction.monto)}</td>
-                    <td class="py-3 px-4 text-right text-purple-400 font-medium">${formatAmount(transaction.total_re_iva)}</td>
-                    <td class="py-3 px-4 text-center">
-                        <button class="revert-invoice-btn bg-orange-600 text-white p-1 rounded-full hover:bg-orange-700 transition-colors shadow-md text-xs" data-id="${transaction.id}">
-                            R
-                        </button>
-                    </td>
-                `;
+                if (!transaction.id) return;
+                const row = document.createElement('tr'); row.classList.add('border-b', 'border-gray-600', 'hover:bg-gray-600');
+                totalOriginalAmount += transaction.monto; totalReIva += transaction.total_re_iva;
+                row.innerHTML = `<td class="py-3 px-4">${new Date(transaction.fecha).toLocaleDateString('es-ES')}</td><td class="py-3 px-4">${transaction.tipo}</td><td class="py-3 px-4">${transaction.cuenta}</td><td class="py-3 px-4">${transaction.categoria}</td><td class="py-3 px-4 text-right">${formatAmount(transaction.monto)}</td><td class="py-3 px-4 text-right text-purple-400 font-medium">${formatAmount(transaction.total_re_iva)}</td><td class="py-3 px-4 text-center"><button class="revert-invoice-btn bg-orange-600 text-white p-1 rounded-full hover:bg-orange-700 shadow-md text-xs" data-id="${transaction.id}">R</button></td>`;
                 taxesTableBody.appendChild(row);
             });
-
-            totalOriginalAmountEl.textContent = formatAmount(totalOriginalAmount);
-            totalReIvaAmountEl.textContent = formatAmount(totalReIva);
-            totalReIvaReturnEl.textContent = formatAmount(totalReIva); // Actualizar tarjeta destacada
-
-            // Añadir event listeners para el botón "Revertir" en la tabla de impuestos
-            document.querySelectorAll('.revert-invoice-btn').forEach(button => {
-                button.addEventListener('click', (event) => {
-                    const id = event.currentTarget.dataset.id;
-                    // Verificar que el ID sea válido antes de llamar a la función
-                    if (id && id !== "undefined") {
-                        revertInvoicedTransaction(id);
-                    } else {
-                        console.error('Se intentó revertir con un ID no válido desde el botón:', id);
-                        showNotification('Error: ID de factura no válido para revertir.', true);
-                    }
-                });
-            });
+            totalOriginalAmountEl.textContent = formatAmount(totalOriginalAmount); totalReIvaAmountEl.textContent = formatAmount(totalReIva); totalReIvaReturnEl.textContent = formatAmount(totalReIva);
+            document.querySelectorAll('.revert-invoice-btn').forEach(b => b.onclick = (e) => { const id = e.currentTarget.dataset.id; if (id && id !== "undefined") revertInvoicedTransaction(id); });
         }
-
-        // Función para revertir una transacción marcada con factura
         async function revertInvoicedTransaction(id) {
-            const confirmRevert = await new Promise(resolve => {
-                const modal = document.createElement('div');
-                modal.className = 'fixed inset-0 bg-gray-950 bg-opacity-75 flex items-center justify-center p-4 z-[102]';
-                modal.innerHTML = `
-                    <div class="bg-gray-800 p-6 rounded-xl shadow-2xl w-full max-w-sm relative animate-fade-in-up text-center text-gray-100">
-                        <h3 class="text-xl font-bold text-gray-100 mb-4">¿Revertir Factura?</h3>
-                        <p class="text-gray-300 mb-6">Esta acción eliminará el registro de factura. El gasto original volverá a estar disponible para marcar con factura.</p>
-                        <div class="flex justify-center space-x-4">
-                            <button id="confirm-yes" class="bg-orange-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-orange-700 transition-colors shadow-md">Sí, Revertir</button>
-                            <button id="confirm-no" class="bg-gray-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-gray-700 transition-colors shadow-md">Cancelar</button>
-                        </div>
-                    </div>
-                `;
-                document.body.appendChild(modal);
-
-                document.getElementById('confirm-yes').addEventListener('click', () => {
-                    modal.remove();
-                    resolve(true);
-                });
-                document.getElementById('confirm-no').addEventListener('click', () => {
-                    modal.remove();
-                    resolve(false);
-                });
-            });
-
-            if (!confirmRevert) {
-                return;
-            }
-
-            // Validar el ID antes de la llamada a Supabase
-            if (!id || id === "undefined") {
-                console.error('Error: ID de transacción para revertir es indefinido o nulo (o la cadena "undefined"). ID recibido:', id);
-                showNotification('Error: ID de transacción para revertir no encontrado.', true);
-                return;
-            }
-
+            if (!confirm('¿Revertir Factura?')) return; if (!id || id === "undefined") { showNotification('Error: ID no válido.', true); return; }
             try {
-                const { error } = await supabaseClient
-                    .from('gastos_con_factura')
-                    .delete()
-                    .eq('id', id); // Eliminar por el ID de la tabla de facturas
-
-                if (error) throw error;
-
-                showNotification('Gasto revertido de factura con éxito.');
-                updateDashboardData();
-                loadMonthlyTransactions(); // Recargar transacciones para que el botón "Con Factura" vuelva a aparecer
-                loadTaxesData(); // Recargar tabla de impuestos
-            } catch (error) {
-                console.error('Error al revertir la factura:', error.message);
-                showNotification('Error al revertir la factura.', true);
-            }
+                const { error } = await supabaseClient.from('gastos_con_factura').delete().eq('id', id); if (error) throw error;
+                showNotification('Gasto revertido de factura.'); updateDashboardData(); loadTransactionsHistory(); loadTaxesData();
+            } catch (error) { console.error('Error al revertir factura:', error.message); showNotification('Error al revertir factura.', true); }
         }
-
-
-        // --- EVENT LISTENERS ---
-
-        // Listener para el formulario de login
-        loginForm.addEventListener('submit', handleLoginSubmit);
-
-        // Listener para el botón de alternar tema
-        themeToggleBtn.addEventListener('click', toggleTheme);
-
-        // Navegación de pestañas
-        navDashboard.addEventListener('click', (e) => {
-            e.preventDefault();
-            showSection('dashboard-section');
-            updateDashboardData(); // Actualizar todos los datos del dashboard
-        });
-
-        navTransactions.addEventListener('click', (e) => {
-            e.preventDefault();
-            showSection('transactions-section');
-            loadMonthlyTransactions(); // Cargar transacciones al ir a la sección
-        });
-
-        navAccounts.addEventListener('click', (e) => {
-            e.preventDefault();
-            showSection('accounts-section');
-            loadAccountBalances(); // Cargar saldos al ir a la sección
-        });
-
-        navServices.addEventListener('click', (e) => {
-            e.preventDefault();
-            showSection('services-section');
-            loadServices(); // Cargar servicios al ir a la sección
-        });
-
-        navGoals.addEventListener('click', (e) => {
-            e.preventDefault();
-            showSection('goals-section');
-            loadGoalsData(); // Cargar datos de objetivos al ir a la sección
-        });
-
-        navTaxes.addEventListener('click', (e) => { // Nuevo listener para Impuestos
-            e.preventDefault();
-            showSection('taxes-section');
-            loadTaxesData(); // Cargar datos de impuestos al ir a la sección
-        });
-
-        navLogout.addEventListener('click', (e) => { // Listener para cerrar sesión
-            e.preventDefault();
-            logout();
-        });
-
-        // Abrir y cerrar modal de transacción
-        addTransactionBtn.addEventListener('click', () => openTransactionModal());
-        closeModalBtn.addEventListener('click', closeTransactionModal);
-        transactionModal.addEventListener('click', (e) => {
-            if (e.target === transactionModal) {
-                closeTransactionModal();
-            }
-        });
-
-        // Envío del formulario de transacción
-        transactionForm.addEventListener('submit', handleTransactionSubmit);
-
-        // Abrir y cerrar modal de traspaso
         addTransferBtn.addEventListener('click', openTransferModal);
         closeTransferModalBtn.addEventListener('click', closeTransferModal);
-        transferModal.addEventListener('click', (e) => {
-            if (e.target === transferModal) {
-                closeTransferModal();
-            }
-        });
-
-        // Envío del formulario de traspaso
+        transferModal.addEventListener('click', (e) => { if (e.target === transferModal) closeTransferModal(); });
         transferForm.addEventListener('submit', handleTransferSubmit);
-
-        // Abrir y cerrar modal de añadir servicio
         addServiceBtn.addEventListener('click', () => openAddServiceModal());
         closeAddServiceModalBtn.addEventListener('click', closeAddServiceModal);
-        addServiceModal.addEventListener('click', (e) => {
-            if (e.target === addServiceModal) {
-                closeAddServiceModal();
-            }
-        });
-        // Envío del formulario de añadir/editar servicio
+        addServiceModal.addEventListener('click', (e) => { if (e.target === addServiceModal) closeAddServiceModal(); });
         addServiceForm.addEventListener('submit', handleAddServiceSubmit);
-
-        // Cerrar modal de pagar servicio
         closePayServiceModalBtn.addEventListener('click', closePayServiceModal);
-        payServiceModal.addEventListener('click', (e) => {
-            if (e.target === payServiceModal) {
-                closePayServiceModal();
-            }
-        });
-        // Envío del formulario de pagar servicio
+        payServiceModal.addEventListener('click', (e) => { if (e.target === payServiceModal) closePayServiceModal(); });
         payServiceForm.addEventListener('submit', handlePayServiceSubmit);
-
-        // Event listeners para la sección de Objetivos
         goalsConfigForm.addEventListener('submit', handleGoalsConfigSubmit);
         closeMonthSaveSavingBtn.addEventListener('click', handleCloseMonthSaveSaving);
-
-        // Abrir y cerrar sidebar en móvil
-        openSidebarBtn.addEventListener('click', () => {
-            sidebar.classList.add('open');
-        });
-        closeSidebarBtn.addEventListener('click', () => {
-            sidebar.classList.remove('open');
-        });
-
-        // Inicialización al cargar el DOM
-        document.addEventListener('DOMContentLoaded', () => {
-            // Aplicar el tema guardado o el tema por defecto
-            const savedTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-            applyTheme(savedTheme);
-
-            // Comprobar si hay una sesión guardada
-            const storedInitial = localStorage.getItem('currentUserInitial');
-            if (storedInitial) {
-                currentUserInitial = storedInitial;
-                showMainApp(); // Mostrar la aplicación directamente
-            } else {
-                showLoginSection(); // Mostrar la pantalla de login
-            }
-        });
     </script>
 </body>
 </html>
